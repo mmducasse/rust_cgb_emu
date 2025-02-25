@@ -1,10 +1,11 @@
 // /////////////////////////////////////////////////////////// //
 //                                                             //
-// Project: Rust Game Boy Emulator                             //
+// Project: Rust Game Boy Color Emulator                       //
 // Author:  Matthew M. Ducasse                                 //
-// Date:    Jan 2025                                           //
+// Date:    Mar 2025                                           //
 //                                                             //
-// Description: An emulator for the Nintendo Game Boy (1989).  //
+// Description: An emulator for the Nintendo                   //
+//              Game Boy Color (1989).                         //
 //                                                             //
 // /////////////////////////////////////////////////////////// //
 
@@ -40,9 +41,9 @@ mod test;
 mod time;
 mod util;
 
-#[macroquad::main("rust_gb_emu")]
+#[macroquad::main("rust_cgb_emu")]
 async fn main() {
-    println!("*** RUST GAMEBOY EMU (Matthew Ducasse 2025) ***");
+    println!("*** RUST GAMEBOY COLOR EMU (Matthew Ducasse 2025) ***");
 
     run_emu().await;
 }

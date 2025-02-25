@@ -1,12 +1,12 @@
 [package]
-name = "rust_gb_2"
+name = "rust_cgb_emu"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 macroquad = "0.4.13"
-strum = "0.26"
-strum_macros = "0.26"
+strum = "0.27"
+strum_macros = "0.27"
 num = "0.4"
 num-derive = "0.4"
 num-traits = "0.2"
