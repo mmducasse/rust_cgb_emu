@@ -12,6 +12,7 @@ use super::{
     cart_hw::CartHw,
     hw_mbc1::HwMbc1,
     hw_mbc3::HwMbc3,
+    hw_mbc5::HwMbc5,
     hw_rom_only::HwRomOnly,
     type_::{CartType, MbcType},
 };
@@ -76,7 +77,9 @@ impl Cart {
             Some(MbcType::Mbc3) => {
                 Box::new(HwMbc3::new(header.rom_bank_count, header.ram_bank_count))
             }
-            Some(MbcType::Mbc5) => todo!(),
+            Some(MbcType::Mbc5) => {
+                Box::new(HwMbc5::new(header.rom_bank_count, header.ram_bank_count))
+            }
             Some(MbcType::Mbc6) => todo!(),
             Some(MbcType::Mbc7) => todo!(),
             None => Box::new(HwRomOnly::new(header.rom_bank_count)),
