@@ -1,10 +1,16 @@
 use num::FromPrimitive;
 
-use crate::cart::consts::{RAM_BANK_SIZE, ROM_BANK_SIZE};
+use crate::{
+    cart::consts::{RAM_BANK_SIZE, ROM_BANK_SIZE},
+    other::mode::CompatibilityMode,
+};
 
 use super::type_::CartType;
 
 const NINTENDO_LOGO: &[u8] = include_bytes!("..\\..\\assets\\files\\nintendo_logo.txt");
+
+const CGB_FLAG_BACKWARD_COMPATIBILE: u8 = 0x80;
+const CGB_FLAG_CGB_ONLY: u8 = 0xC0;
 
 /// The interpretation of the data in the cartridge ROM header (addresses 0x0100-0x014F).
 pub struct CartHeader {
@@ -87,6 +93,14 @@ impl CartHeader {
         }
     }
 
+    pub fn compatibility_mode(&self) -> CompatibilityMode {
+        match self.cgb_flag {
+            CGB_FLAG_BACKWARD_COMPATIBILE => CompatibilityMode::CgbBackward,
+            CGB_FLAG_CGB_ONLY => CompatibilityMode::CgbOnly,
+            _ => CompatibilityMode::DmgOnly,
+        }
+    }
+
     pub fn print(&self) {
         println!("Cartridge Header:");
 
@@ -94,10 +108,10 @@ impl CartHeader {
             println!("  Title: {}", title);
         }
 
-        let compatibility = match self.cgb_flag {
-            0x80 => "CGB (backward compatibile)",
-            0xC0 => "CGB only",
-            _ => "DMG only",
+        let compatibility = match self.compatibility_mode() {
+            CompatibilityMode::CgbBackward => "CGB (backward compatibile)",
+            CompatibilityMode::CgbOnly => "CGB only",
+            CompatibilityMode::DmgOnly => "DMG only",
         };
         println!(
             "  Compatibility = 0x{:0>2X}: {}",

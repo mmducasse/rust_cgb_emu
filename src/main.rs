@@ -19,7 +19,7 @@ use macroquad::{
 };
 use other::save::{load_state, save_state};
 use ppu::{consts::window_size, ui::render_ui};
-use sys::{Options, Sys};
+use sys::{options::Options, Sys};
 use xf::mq::{
     draw::draw_rect,
     window::{Window, WindowParams},
@@ -66,6 +66,9 @@ async fn run_emu() {
     //let path = ".\\assets\\real_gb_roms\\Wario Land.gb";
     //let path = ".\\assets\\real_gb_roms\\DuckTales.gb";
 
+    //let path = ".\\assets\\real_cgb_roms\\Oracle of Seasons.gbc";
+    //let path = ".\\assets\\real_cgb_roms\\Crystal Version.gbc";
+
     //let path = ".\\assets\\homebrew_roms\\porklike.gb";
     //let path = ".\\assets\\homebrew_roms\\20y.gb";
     //let path = ".\\assets\\homebrew_roms\\64boy-opcode-scroll.gb";
@@ -73,12 +76,9 @@ async fn run_emu() {
 
     //let path = ".\\assets\\other\\hello_world\\rom.gb";
 
-    let cart = match Cart::load_from(path, true) {
-        Ok(cart) => cart,
-        Err(msg) => {
-            panic!("{}", msg);
-        }
-    };
+    let cart = Cart::load_from(path, true).unwrap_or_else(|msg| {
+        panic!("{}", msg);
+    });
 
     let show_vram_views = true;
     let options = Options {

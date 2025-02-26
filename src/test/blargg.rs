@@ -9,7 +9,7 @@ use crate::{
     consts::{PIXEL_SCALE, SCREEN_SIZE},
     debug::{self, initialize_debug, DebugConfig},
     ppu::ui::render_ui,
-    sys::{Options, Sys},
+    sys::{options::Options, Sys},
 };
 
 /// Runs every blargg's cpu_instrs test in sequence and prints the results
