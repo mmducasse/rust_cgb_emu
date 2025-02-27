@@ -33,19 +33,24 @@ pub enum IoReg {
     Obp1 = 0xFF49,
     Wy = 0xFF4A,
     Wx = 0xFF4B,
-    // Key1 = 0xFF4D,
-    // Vbk = 0xFF4F,
-    // Hdma1 = 0xFF51,
-    // Hdma2 = 0xFF52,
-    // Hdma3 = 0xFF53,
-    // Hdma4 = 0xFF54,
-    // Hdma5 = 0xFF55,
-    // Rp = 0xFF56,
-    // Bcps = 0xFF68,
-    // Bcpd = 0xFF69,
-    // Ocps = 0xFF6A,
-    // Ocpd = 0xFF6B,
-    // Svbk = 0xFF70,
+
+    Key1 = 0xFF4D,
+    Vbk = 0xFF4F,
+    Hdma1 = 0xFF51,
+    Hdma2 = 0xFF52,
+    Hdma3 = 0xFF53,
+    Hdma4 = 0xFF54,
+    Hdma5 = 0xFF55,
+    Rp = 0xFF56,
+    Bcps = 0xFF68,
+    Bcpd = 0xFF69,
+    Ocps = 0xFF6A,
+    Ocpd = 0xFF6B,
+    Opri = 0xFF6C,
+    Svbk = 0xFF70,
+    Pcm12 = 0xFF76,
+    Pcm34 = 0xFF77,
+
     Ie = 0xFFFF,
 }
 
@@ -187,15 +192,21 @@ mod io_reg_data {
         }
 
         pub fn from_reg(reg: IoReg) -> Self {
+            use IoReg::*;
+
             let read_mask = match reg {
-                IoReg::If => 0b0001_1111,
+                If => 0b0001_1111,
                 _ => 0xFF,
             };
 
             let write_mask = match reg {
-                IoReg::If => 0b0001_1111,
-                IoReg::Stat => 0b1111_1000,
-                IoReg::Ly => 0b0000_0000,
+                If => 0b0001_1111,
+                Stat => 0b1111_1000,
+                Ly => 0b0000_0000,
+                Key1 => 0b0111_1111,
+                Rp => 0b1111_1101,
+                Pcm12 => 0b0000_0000,
+                Pcm34 => 0b0000_0000,
                 _ => 0xFF,
             };
 
