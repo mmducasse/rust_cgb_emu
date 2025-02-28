@@ -1,10 +1,10 @@
 use crate::{cart::cart::Cart, consts::FAIL_ON_BAD_RW, debug};
 
-use super::{array::Array, io_regs::IoRegs, sections::MemSection, Addr};
+use super::{array::Array, io_regs::IoRegs, sections::MemSection, wram::Wram, Addr};
 
 pub struct Mem {
     pub cart: Cart,
-    pub wram: Array,
+    pub wram: Wram,
     pub vram: Array,
     pub oam: Array,
     pub io_regs: IoRegs,
@@ -13,9 +13,11 @@ pub struct Mem {
 
 impl Mem {
     pub fn new(cart: Cart) -> Self {
+        let is_cgb_mode = cart.header().compatibility_mode().is_cgb_only();
+
         Self {
             cart,
-            wram: MemSection::into_array(MemSection::Wram),
+            wram: Wram::new(is_cgb_mode),
             vram: MemSection::into_array(MemSection::Vram),
             oam: MemSection::into_array(MemSection::Oam),
             io_regs: IoRegs::new(),
@@ -32,7 +34,7 @@ impl Mem {
             MemSection::CartRom => self.cart.read(addr),
             MemSection::Vram => self.vram.read(addr),
             MemSection::ExtRam => self.cart.read(addr), // sys.ext_ram.rd(abs_addr),
-            MemSection::Wram => self.wram.read(addr),
+            MemSection::Wram => self.wram.read(&self.io_regs, addr),
             MemSection::EchoRam => {
                 if FAIL_ON_BAD_RW {
                     debug::fail("Attempted to read from Echo RAM");
@@ -66,7 +68,7 @@ impl Mem {
                 self.cart.write(addr, data);
             }
             MemSection::Wram => {
-                self.wram.write(addr, data);
+                self.wram.write(&self.io_regs, addr, data);
             }
             MemSection::EchoRam => {
                 if FAIL_ON_BAD_RW {

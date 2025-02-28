@@ -19,7 +19,7 @@ pub enum MemSection {
 
 impl MemSection {
     /// Returns the starting address of the memory section.
-    pub fn start_addr(self) -> Addr {
+    pub const fn start_addr(self) -> Addr {
         use MemSection::*;
 
         match self {

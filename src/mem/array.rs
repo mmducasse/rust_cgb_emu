@@ -14,6 +14,11 @@ impl Array {
         }
     }
 
+    pub fn contains_addr(&self, addr: Addr) -> bool {
+        let rel_addr = addr - self.start_addr;
+        return rel_addr < self.memory.len() as u16;
+    }
+
     pub fn read(&self, abs_addr: impl Into<Addr>) -> u8 {
         let idx = self.to_idx(abs_addr);
         return self.memory[idx];
