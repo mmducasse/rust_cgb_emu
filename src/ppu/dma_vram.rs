@@ -7,7 +7,7 @@ use crate::{
 use super::ppu::PpuMode;
 
 /// Represents the VRAM DMA Transfer state (CGB only).
-pub struct Hdma {
+pub struct DmaVram {
     is_active: bool,
     src_addr: Addr,
     dst_addr: Addr,
@@ -33,7 +33,8 @@ enum TransferMode {
     HBlank,
 }
 
-impl Hdma {
+/// Represents the VRAM DMA Transfer state.
+impl DmaVram {
     pub fn new() -> Self {
         Self {
             is_active: false,
@@ -47,8 +48,8 @@ impl Hdma {
     }
 }
 
-/// Advances the DMA state by one M-Cycle.
-pub fn update_hdma(sys: &mut Sys) {
+/// Advances the VRAM DMA state by one M-Cycle.
+pub fn update_vram_dma(sys: &mut Sys) {
     // Is VRAM DMA supported?
     if !sys.mem.cart.header().compatibility_mode().is_cgb() {
         return;
@@ -58,7 +59,7 @@ pub fn update_hdma(sys: &mut Sys) {
 
     // Check if VRAM DMA was requested.
     //let hdma = sys.ppu.hdma_mut();
-    if !sys.ppu.hdma_mut().is_active {
+    if !sys.ppu.vram_dma_mut().is_active {
         if sys.mem.io_regs.hdma_requested {
             sys.mem.io_regs.hdma_requested = false;
             start_hdma(sys);
@@ -71,12 +72,12 @@ pub fn update_hdma(sys: &mut Sys) {
     //transfer_0x10_bytes(sys);
 
     // Transfer data.
-    if sys.ppu.hdma_mut().transfer_mode == TransferMode::HBlank {
-        if (ppu_mode == PpuMode::HBlank) && sys.ppu.hdma_mut().pending_hblank_transfer {
+    if sys.ppu.vram_dma_mut().transfer_mode == TransferMode::HBlank {
+        if (ppu_mode == PpuMode::HBlank) && sys.ppu.vram_dma_mut().pending_hblank_transfer {
             transfer_0x10_bytes(sys);
-            sys.ppu.hdma_mut().pending_hblank_transfer = false;
+            sys.ppu.vram_dma_mut().pending_hblank_transfer = false;
         } else {
-            sys.ppu.hdma_mut().pending_hblank_transfer = true;
+            sys.ppu.vram_dma_mut().pending_hblank_transfer = true;
         }
     } else {
         transfer_0x10_bytes(sys);
@@ -100,7 +101,7 @@ fn start_hdma(sys: &mut Sys) {
     };
     let data_len = (bits8(&hdma5, 6, 0) + 1) * 0x10;
 
-    let hdma = sys.ppu.hdma_mut();
+    let hdma = sys.ppu.vram_dma_mut();
     hdma.is_active = true;
     hdma.src_addr = src_addr;
     hdma.dst_addr = dst_addr;
@@ -124,7 +125,7 @@ fn transfer_0x10_bytes(sys: &mut Sys) {
     for _ in 0..0x10 {
         transfer_one_byte(sys);
 
-        let hdma = sys.ppu.hdma_mut();
+        let hdma = sys.ppu.vram_dma_mut();
         if hdma.next_idx >= (hdma.data_len as u16) {
             hdma.is_active = false;
 
@@ -137,7 +138,7 @@ fn transfer_0x10_bytes(sys: &mut Sys) {
 }
 
 fn transfer_one_byte(sys: &mut Sys) {
-    let hdma = sys.ppu.hdma_mut();
+    let hdma = sys.ppu.vram_dma_mut();
 
     let idx = hdma.next_idx;
     let src_addr = hdma.src_addr + idx;

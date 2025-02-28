@@ -1,6 +1,6 @@
 pub mod consts;
-mod dma;
-mod hdma;
+mod dma_oam;
+mod dma_vram;
 mod lcdc;
 mod palette;
 pub mod ppu;

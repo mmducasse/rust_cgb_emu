@@ -7,8 +7,8 @@ use crate::{
 
 use super::{
     consts::VIEWPORT_ORG,
-    dma::{update_dma, Dma},
-    hdma::{update_hdma, Hdma},
+    dma_oam::{update_oam_dma, DmaOam},
+    dma_vram::{update_vram_dma, DmaVram},
     render::render_scanline,
 };
 
@@ -28,8 +28,8 @@ pub struct Ppu {
     curr_scanline_dot: u32,
     total_frames_drawn: u64,
     mode: PpuMode,
-    dma: Dma,
-    hdma: Hdma,
+    dma: DmaOam,
+    hdma: DmaVram,
 }
 
 impl Ppu {
@@ -38,8 +38,8 @@ impl Ppu {
             curr_scanline_dot: 0,
             total_frames_drawn: 0,
             mode: PpuMode::HBlank,
-            dma: Dma::new(),
-            hdma: Hdma::new(),
+            dma: DmaOam::new(),
+            hdma: DmaVram::new(),
         }
     }
 
@@ -51,11 +51,11 @@ impl Ppu {
         self.mode
     }
 
-    pub fn dma_mut(&mut self) -> &mut Dma {
+    pub fn oam_dma_mut(&mut self) -> &mut DmaOam {
         &mut self.dma
     }
 
-    pub fn hdma_mut(&mut self) -> &mut Hdma {
+    pub fn vram_dma_mut(&mut self) -> &mut DmaVram {
         &mut self.hdma
     }
 }
@@ -66,8 +66,8 @@ pub fn update_ppu(sys: &mut Sys) {
     for _ in 0..4 {
         update(sys);
     }
-    update_dma(sys);
-    update_hdma(sys);
+    update_oam_dma(sys);
+    update_vram_dma(sys);
 }
 
 fn update(sys: &mut Sys) {

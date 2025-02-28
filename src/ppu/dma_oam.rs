@@ -3,12 +3,12 @@ use crate::{mem::io_regs::IoReg, sys::Sys};
 const DMA_DURATION_M_CYCLES: u16 = 160;
 
 /// Represents the OAM DMA Transfer state.
-pub struct Dma {
+pub struct DmaOam {
     is_active: bool,
     next_idx: u16,
 }
 
-impl Dma {
+impl DmaOam {
     pub fn new() -> Self {
         Self {
             is_active: false,
@@ -17,9 +17,9 @@ impl Dma {
     }
 }
 
-/// Advances the DMA state by one M-Cycle.
-pub fn update_dma(sys: &mut Sys) {
-    let dma = sys.ppu.dma_mut();
+/// Advances the OAM DMA state by one M-Cycle.
+pub fn update_oam_dma(sys: &mut Sys) {
+    let dma = sys.ppu.oam_dma_mut();
     if !dma.is_active {
         if sys.mem.io_regs.dma_requested {
             sys.mem.io_regs.dma_requested = false;
@@ -33,13 +33,13 @@ pub fn update_dma(sys: &mut Sys) {
 }
 
 fn start_dma(sys: &mut Sys) {
-    let dma = sys.ppu.dma_mut();
+    let dma = sys.ppu.oam_dma_mut();
     dma.is_active = true;
     dma.next_idx = 0;
 }
 
 fn transfer_one_byte(sys: &mut Sys) {
-    let dma = sys.ppu.dma_mut();
+    let dma = sys.ppu.oam_dma_mut();
 
     let idx = dma.next_idx;
     let dma_val = sys.mem.io_regs.get(IoReg::Dma) as u16;
