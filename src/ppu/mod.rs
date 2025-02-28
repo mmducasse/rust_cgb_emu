@@ -1,5 +1,6 @@
 pub mod consts;
 mod dma;
+mod hdma;
 mod lcdc;
 mod palette;
 pub mod ppu;

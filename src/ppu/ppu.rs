@@ -8,6 +8,7 @@ use crate::{
 use super::{
     consts::VIEWPORT_ORG,
     dma::{update_dma, Dma},
+    hdma::{update_hdma, Hdma},
     render::render_scanline,
 };
 
@@ -15,7 +16,7 @@ pub const DOTS_PER_SCANLINE: u32 = 456;
 pub const SCANLINES_PER_FRAME: u8 = 154;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
-enum PpuMode {
+pub enum PpuMode {
     HBlank,
     VBlank,
     OamScan,
@@ -26,7 +27,9 @@ enum PpuMode {
 pub struct Ppu {
     curr_scanline_dot: u32,
     total_frames_drawn: u64,
+    mode: PpuMode,
     dma: Dma,
+    hdma: Hdma,
 }
 
 impl Ppu {
@@ -34,7 +37,9 @@ impl Ppu {
         Self {
             curr_scanline_dot: 0,
             total_frames_drawn: 0,
+            mode: PpuMode::HBlank,
             dma: Dma::new(),
+            hdma: Hdma::new(),
         }
     }
 
@@ -42,8 +47,16 @@ impl Ppu {
         self.total_frames_drawn
     }
 
+    pub fn mode(&self) -> PpuMode {
+        self.mode
+    }
+
     pub fn dma_mut(&mut self) -> &mut Dma {
         &mut self.dma
+    }
+
+    pub fn hdma_mut(&mut self) -> &mut Hdma {
+        &mut self.hdma
     }
 }
 
@@ -54,6 +67,7 @@ pub fn update_ppu(sys: &mut Sys) {
         update(sys);
     }
     update_dma(sys);
+    update_hdma(sys);
 }
 
 fn update(sys: &mut Sys) {

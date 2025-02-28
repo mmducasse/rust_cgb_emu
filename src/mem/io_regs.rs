@@ -72,6 +72,7 @@ pub struct IoRegs {
     reg_datas: HashMap<IoReg, IoRegData>,
 
     pub dma_requested: bool,
+    pub hdma_requested: bool,
 }
 
 impl IoRegs {
@@ -88,6 +89,7 @@ impl IoRegs {
             reg_datas,
 
             dma_requested: false,
+            hdma_requested: false,
         };
     }
 
@@ -136,6 +138,8 @@ impl IoRegs {
                 debug::push_serial_char(serial_data as char);
             } else if reg == IoReg::Dma {
                 self.dma_requested = true;
+            } else if reg == IoReg::Hdma5 {
+                self.hdma_requested = true;
             }
 
             if reg == IoReg::Div {

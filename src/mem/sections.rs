@@ -20,17 +20,19 @@ pub enum MemSection {
 impl MemSection {
     /// Returns the starting address of the memory section.
     pub fn start_addr(self) -> Addr {
+        use MemSection::*;
+
         match self {
-            MemSection::CartRom => 0x0000,
-            MemSection::Vram => 0x8000,
-            MemSection::ExtRam => 0xA000,
-            MemSection::Wram => 0xC000,
-            MemSection::EchoRam => 0xE000,
-            MemSection::Oam => 0xFE00,
-            MemSection::UnusableMemory => 0xFEA0,
-            MemSection::IoRegs => 0xFF00,
-            MemSection::Hram => 0xFF80,
-            MemSection::IeReg => 0xFFFF,
+            CartRom => 0x0000,
+            Vram => 0x8000,
+            ExtRam => 0xA000,
+            Wram => 0xC000,
+            EchoRam => 0xE000,
+            Oam => 0xFE00,
+            UnusableMemory => 0xFEA0,
+            IoRegs => 0xFF00,
+            Hram => 0xFF80,
+            IeReg => 0xFFFF,
         }
     }
 
