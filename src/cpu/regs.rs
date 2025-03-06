@@ -1,4 +1,7 @@
-use crate::util::{bits::Bits, math::{join_16, set_bit8, split_16}};
+use crate::util::{
+    bits::Bits,
+    math::{join_16, split_16},
+};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum CpuReg8 {
@@ -124,7 +127,7 @@ impl CpuRegs {
     pub fn set_flag(&mut self, flag: CpuFlag, value: bool) {
         let idx = flag as u8;
         let mut f_data = self.get_8(CpuReg8::F);
-        set_bit8(&mut f_data, idx, value.into());
+        f_data.set_bit(idx, value.into());
         self.set_8(CpuReg8::F, f_data);
     }
 

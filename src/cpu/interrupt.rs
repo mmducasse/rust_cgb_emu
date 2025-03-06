@@ -5,7 +5,6 @@ use crate::{
     debug,
     mem::{io_regs::IoReg, Addr},
     sys::Sys,
-    util::math::{set_bit8},
     util::bits::Bits,
 };
 
@@ -41,7 +40,7 @@ impl InterruptType {
 pub fn request_interrupt(sys: &mut Sys, type_: InterruptType) {
     //println!("Int req: {:?}", type_);
     sys.mem.io_regs.mut_(IoReg::If, |if_| {
-        set_bit8(if_, type_.flag_idx(), 1);
+        if_.set_bit(type_.flag_idx(), 1);
     });
 }
 
@@ -77,7 +76,7 @@ fn handle_interrupt(sys: &mut Sys, type_: InterruptType) {
     sys.cpu_enable = true;
 
     sys.mem.io_regs.mut_(IoReg::If, |if_| {
-        set_bit8(if_, type_.flag_idx(), 0);
+        if_.set_bit(type_.flag_idx(), 0);
     });
 
     // 2 NOP cycles

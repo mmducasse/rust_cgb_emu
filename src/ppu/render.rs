@@ -2,7 +2,8 @@ use xf::num::ivec2::{i2, IVec2};
 
 use crate::{
     mem::{io_regs::IoReg, Addr},
-    sys::Sys, util::bits::Bits,
+    sys::Sys,
+    util::bits::Bits,
 };
 
 use super::{

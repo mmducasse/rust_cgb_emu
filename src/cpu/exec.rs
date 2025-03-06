@@ -6,7 +6,7 @@ use crate::{
     sys::Sys,
     util::{
         bits::Bits,
-        math::{add16_ui, add16_uu, bits8, join_16, set_bit8, split_16},
+        math::{add16_ui, add16_uu, bits8, join_16, split_16},
     },
 };
 
@@ -402,7 +402,7 @@ fn rla(sys: &mut Sys) -> u8 {
     let mut data = sys.regs.get_8(CpuReg8::A);
     let c_ = data.bit(7) == 0b1;
     data = u8::rotate_left(data, 1);
-    set_bit8(&mut data, 0, c);
+    data.set_bit(0, c);
     sys.regs.set_8(CpuReg8::A, data);
 
     sys.regs.set_flag(CpuFlag::Z, false);
@@ -1049,7 +1049,7 @@ fn rl_r8(sys: &mut Sys, operand: R8) -> u8 {
     let c_ = data.bit(7);
 
     data = u8::rotate_left(data, 1);
-    set_bit8(&mut data, 0, c);
+    data.set_bit(0, c);
     set_r8_data(sys, operand, data);
 
     sys.regs.set_flag(CpuFlag::Z, data == 0);
@@ -1066,7 +1066,7 @@ fn rr_r8(sys: &mut Sys, operand: R8) -> u8 {
     let c_ = data.bit(0);
 
     data = u8::rotate_right(data, 1);
-    set_bit8(&mut data, 7, c);
+    data.set_bit(7, c);
     set_r8_data(sys, operand, data);
 
     sys.regs.set_flag(CpuFlag::Z, data == 0);
@@ -1098,7 +1098,7 @@ fn sra_r8(sys: &mut Sys, operand: R8) -> u8 {
     let c_ = data.bit(0);
 
     data = u8::wrapping_shr(data, 1); // todo correct??
-    set_bit8(&mut data, 7, data7);
+    data.set_bit(7, data7);
     set_r8_data(sys, operand, data);
 
     sys.regs.set_flag(CpuFlag::Z, data == 0);
@@ -1152,7 +1152,7 @@ fn bit_b3_r8(sys: &mut Sys, b3: u8, operand: R8) -> u8 {
 
 fn res_b3_r8(sys: &mut Sys, b3: u8, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
-    set_bit8(&mut data, b3, 0);
+    data.set_bit(b3, 0);
     set_r8_data(sys, operand, data);
 
     return if operand == R8::HlMem { 4 } else { 2 };
@@ -1160,7 +1160,7 @@ fn res_b3_r8(sys: &mut Sys, b3: u8, operand: R8) -> u8 {
 
 fn set_b3_r8(sys: &mut Sys, b3: u8, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
-    set_bit8(&mut data, b3, 1);
+    data.set_bit(b3, 1);
     set_r8_data(sys, operand, data);
 
     return if operand == R8::HlMem { 4 } else { 2 };

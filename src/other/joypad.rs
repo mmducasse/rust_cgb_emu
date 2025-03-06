@@ -14,9 +14,7 @@ use crate::{
     consts::P8,
     mem::io_regs::IoReg,
     sys::Sys,
-    util::{
-        bits::Bits, draw::draw_empty_rect, math::{set_bit8, set_bits8}
-    },
+    util::{bits::Bits, draw::draw_empty_rect, math::set_bits8},
 };
 
 /// Represents a Game Boy button.
@@ -102,7 +100,7 @@ pub fn handle_joypad_inputs(sys: &mut Sys) {
 fn read_button(p1: &mut u8, idx: u8, button: Button) {
     let value = if is_key_down(button.key_code()) { 0 } else { 1 };
     let mut mask = 0xFF;
-    set_bit8(&mut mask, 0, value);
+    mask.set_bit(0, value);
     mask = u8::rotate_left(mask, idx as u32);
     *p1 &= mask;
 }

@@ -2,7 +2,7 @@ use crate::{
     cpu::interrupt::{request_interrupt, InterruptType},
     mem::io_regs::IoReg,
     sys::{speed::is_full_mcycle, Sys},
-    util::{bits::Bits, math::set_bit8},
+    util::bits::Bits,
 };
 
 use super::{
@@ -118,7 +118,7 @@ fn enter_scanline(sys: &mut Sys, scanline: u8) {
     let lyc = sys.mem.io_regs.get(IoReg::Lyc);
     let stat = sys.mem.io_regs.mut_(IoReg::Stat, |stat| {
         let lyc_ly: u8 = (lyc == ly).into();
-        set_bit8(stat, 2, lyc_ly);
+        stat.set_bit(2, lyc_ly);
     });
 
     let lyc_ly_sel = stat.bit(6) == 1;

@@ -7,7 +7,8 @@ use xf::num::{
 use crate::{
     consts::P8,
     mem::{io_regs::IoReg, sections::MemSection, Addr},
-    sys::Sys, util::bits::Bits,
+    sys::Sys,
+    util::bits::Bits,
 };
 
 use super::{

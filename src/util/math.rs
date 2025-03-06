@@ -12,16 +12,16 @@ pub fn bits8(op: &u8, hi: usize, lo: usize) -> u8 {
     return (op >> lo) & mask;
 }
 
-#[inline]
-pub fn set_bit8(data: &mut u8, idx: u8, value: u8) {
-    let mask = 0x1 << idx;
+// #[inline]
+// pub fn set_bit8(data: &mut u8, idx: u8, value: u8) {
+//     let mask = 0x1 << idx;
 
-    if (value & 0x1) > 0 {
-        *data |= mask;
-    } else {
-        *data &= !mask;
-    }
-}
+//     if (value & 0x1) > 0 {
+//         *data |= mask;
+//     } else {
+//         *data &= !mask;
+//     }
+// }
 
 #[inline]
 pub fn set_bits8(data: &mut u8, hi: u8, lo: u8, value: u8) {

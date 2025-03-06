@@ -1,7 +1,7 @@
 use crate::{
     mem::{io_regs::IoReg, Addr},
     sys::Sys,
-    util::{bits::Bits, math::{bits8, set_bit8}},
+    util::{bits::Bits, math::bits8},
 };
 
 use super::ppu::PpuMode;
@@ -117,7 +117,7 @@ fn start_hdma(sys: &mut Sys) {
 
     // Set Hdma5.7 hi to indicate transfer is active.
     sys.mem.io_regs.mut_(IoReg::Hdma5, |hdma5| {
-        set_bit8(hdma5, 7, 1);
+        hdma5.set_bit(7, 1);
     });
 }
 
@@ -131,7 +131,7 @@ fn transfer_0x10_bytes(sys: &mut Sys) {
 
             // Set Hdma5.7 lo to indicate transfer is inactive.
             sys.mem.io_regs.mut_(IoReg::Hdma5, |hdma5| {
-                set_bit8(hdma5, 7, 0);
+                hdma5.set_bit(7, 0);
             });
         }
     }
