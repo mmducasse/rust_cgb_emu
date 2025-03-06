@@ -1,11 +1,11 @@
 use crate::{cart::cart::Cart, consts::FAIL_ON_BAD_RW, debug};
 
-use super::{array::Array, io_regs::IoRegs, sections::MemSection, wram::Wram, Addr};
+use super::{array::Array, io_regs::IoRegs, sections::MemSection, vram::Vram, wram::Wram, Addr};
 
 pub struct Mem {
     pub cart: Cart,
     pub wram: Wram,
-    pub vram: Array,
+    pub vram: Vram,
     pub oam: Array,
     pub io_regs: IoRegs,
     pub hram: Array,
@@ -18,7 +18,7 @@ impl Mem {
         Self {
             cart,
             wram: Wram::new(is_cgb_mode),
-            vram: MemSection::into_array(MemSection::Vram),
+            vram: Vram::new(is_cgb_mode),
             oam: MemSection::into_array(MemSection::Oam),
             io_regs: IoRegs::new(),
             hram: MemSection::into_array(MemSection::Hram),
@@ -32,7 +32,7 @@ impl Mem {
 
         match section {
             MemSection::CartRom => self.cart.read(addr),
-            MemSection::Vram => self.vram.read(addr),
+            MemSection::Vram => self.vram.read(&self.io_regs, addr),
             MemSection::ExtRam => self.cart.read(addr), // sys.ext_ram.rd(abs_addr),
             MemSection::Wram => self.wram.read(&self.io_regs, addr),
             MemSection::EchoRam => {
@@ -62,7 +62,7 @@ impl Mem {
                 self.cart.write(addr, data);
             }
             MemSection::Vram => {
-                self.vram.write(addr, data);
+                self.vram.write(&self.io_regs, addr, data);
             }
             MemSection::ExtRam => {
                 self.cart.write(addr, data);

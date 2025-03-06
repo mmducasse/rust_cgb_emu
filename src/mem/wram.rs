@@ -36,32 +36,25 @@ impl Wram {
     }
 
     pub fn read(&self, io_regs: &IoRegs, addr: Addr) -> u8 {
-        if self.banks[0].contains_addr(addr) {
-            return self.banks[0].read(addr);
-        } else {
-            let alt_bank = if self.banks.len() > 2 {
-                let svbk = io_regs.get(IoReg::Svbk);
-                u8::max(1, bits8(&svbk, 2, 0)) as usize
-            } else {
-                1
-            };
-
-            return self.banks[alt_bank].read(addr);
-        }
+        let b = self.get_bank(io_regs, addr);
+        return self.banks[b].read(addr);
     }
 
     pub fn write(&mut self, io_regs: &IoRegs, addr: Addr, data: u8) {
-        if self.banks[0].contains_addr(addr) {
-            self.banks[0].write(addr, data);
-        } else {
-            let alt_bank = if self.banks.len() > 2 {
-                let svbk = io_regs.get(IoReg::Svbk);
-                u8::max(1, bits8(&svbk, 2, 0)) as usize
-            } else {
-                1
-            };
+        let b = self.get_bank(io_regs, addr);
+        self.banks[b].write(addr, data);
+    }
 
-            self.banks[alt_bank].write(addr, data);
+    fn get_bank(&self, io_regs: &IoRegs, addr: Addr) -> usize {
+        if self.banks[0].contains_addr(addr) {
+            return 0;
         }
+
+        return if self.banks.len() > 2 {
+            let svbk = io_regs.get(IoReg::Svbk);
+            u8::max(1, bits8(&svbk, 2, 0)) as usize
+        } else {
+            1
+        };
     }
 }
