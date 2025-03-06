@@ -1,7 +1,7 @@
 use crate::{
     cpu::interrupt::{request_interrupt, InterruptType},
     mem::io_regs::IoReg,
-    sys::Sys,
+    sys::{speed::is_full_mcycle, Sys},
     util::math::{bit8, set_bit8},
 };
 
@@ -67,7 +67,10 @@ pub fn update_ppu(sys: &mut Sys) {
         update(sys);
     }
     update_oam_dma(sys);
-    update_vram_dma(sys);
+
+    if is_full_mcycle(sys) {
+        update_vram_dma(sys);
+    }
 }
 
 fn update(sys: &mut Sys) {

@@ -66,9 +66,9 @@ async fn run_emu() {
     //let path = ".\\assets\\real_gb_roms\\Wario Land.gb";
     //let path = ".\\assets\\real_gb_roms\\DuckTales.gb";
 
-    //let path = ".\\assets\\real_cgb_roms\\Oracle of Seasons.gbc";
+    let path = ".\\assets\\real_cgb_roms\\Oracle of Seasons.gbc";
     //let path = ".\\assets\\real_cgb_roms\\Oracle of Ages.gbc";
-    let path = ".\\assets\\real_cgb_roms\\Crystal Version.gbc";
+    //let path = ".\\assets\\real_cgb_roms\\Crystal Version.gbc";
     //let path = ".\\assets\\real_cgb_roms\\Silver Version.gbc";
     //let path = ".\\assets\\real_cgb_roms\\Link's Awakening DX.gbc";
 

@@ -142,6 +142,10 @@ impl IoRegs {
                 self.hdma_requested = true;
             }
 
+            if reg == IoReg::Key1 {
+                println!("  Key1: {:0>2X}", value);
+            }
+
             if reg == IoReg::Div {
                 self.mem.write(addr, 0x00);
             } else {

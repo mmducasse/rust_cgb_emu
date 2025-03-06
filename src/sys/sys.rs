@@ -13,12 +13,17 @@ use crate::{
     },
 };
 
-use super::{init::init, options::Options};
+use super::{
+    init::init,
+    options::Options,
+    speed::{update_speed_ctrl, SpeedControl},
+};
 
 /// Represents the state of the emulated Game Boy system.
 pub struct Sys {
     pub options: Options,
     pub emu: Emu,
+    pub speed_ctrl: SpeedControl,
 
     pub mem: Mem,
     pub ppu: Ppu,
@@ -43,6 +48,7 @@ impl Sys {
         let mut sys = Self {
             options,
             emu: Emu::default(),
+            speed_ctrl: SpeedControl::new(),
 
             mem: Mem::new(cart),
             ppu: Ppu::new(),
@@ -67,8 +73,14 @@ impl Sys {
         return sys;
     }
 
+    pub fn is_cgb_mode(&self) -> bool {
+        self.mem.cart.header().compatibility_mode().is_cgb_only()
+    }
+
     pub fn run_one_m_cycle(&mut self) {
-        if self.cpu_clock.update_and_check() {
+        update_speed_ctrl(self);
+
+        if !self.speed_ctrl.is_stop_active() && self.cpu_clock.update_and_check() {
             self.cpu_delay_ticks = u32::saturating_sub(self.cpu_delay_ticks, 1);
             if self.cpu_delay_ticks == 0 {
                 try_handle_interrupts(self);

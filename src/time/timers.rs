@@ -18,16 +18,18 @@ pub fn update_timer_regs(sys: &mut Sys) {
     // TMA: determines TIMA reset value after overflow
     // TAC: .2: enable; .1-0: clock select;
 
-    let div_ticked = sys.div_timer_clock.update_and_check();
+    if !sys.speed_ctrl.is_stop_active() {
+        let div_ticked = sys.div_timer_clock.update_and_check();
 
-    if div_ticked {
-        sys.mem.io_regs.mut_(IoReg::Div, |div| {
-            let div_ = u8::wrapping_add(*div, 1);
-            if div_ == 0 {
-                // DIV overflow
-            }
-            *div = div_;
-        });
+        if div_ticked {
+            sys.mem.io_regs.mut_(IoReg::Div, |div| {
+                let div_ = u8::wrapping_add(*div, 1);
+                if div_ == 0 {
+                    // DIV overflow
+                }
+                *div = div_;
+            });
+        }
     }
 
     // Update TIMA
@@ -42,7 +44,7 @@ pub fn update_timer_regs(sys: &mut Sys) {
         _ => unreachable!(),
     };
 
-    sys.tima_timer_clock.set_period_dots(tima_clk_period);
+    sys.tima_timer_clock.set_period(tima_clk_period);
 
     if enable {
         let tima_ticked = sys.tima_timer_clock.update_and_check();

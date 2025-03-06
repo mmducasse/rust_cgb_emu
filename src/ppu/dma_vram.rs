@@ -109,11 +109,11 @@ fn start_hdma(sys: &mut Sys) {
     hdma.transfer_mode = transfer_mode;
     hdma.next_idx = 0;
 
-    println!("Start HDMA:");
-    println!("  src_addr   = {:0>4X}", src_addr);
-    println!("  dst_addr   = {:0>4X}", dst_addr);
-    println!("  len        = {:0>4X}", data_len);
-    println!("  txfer mode = {:?}", transfer_mode);
+    // println!("Start HDMA:");
+    // println!("  src_addr   = {:0>4X}", src_addr);
+    // println!("  dst_addr   = {:0>4X}", dst_addr);
+    // println!("  len        = {:0>4X}", data_len);
+    // println!("  txfer mode = {:?}", transfer_mode);
 
     // Set Hdma5.7 hi to indicate transfer is active.
     sys.mem.io_regs.mut_(IoReg::Hdma5, |hdma5| {

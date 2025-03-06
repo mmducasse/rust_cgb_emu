@@ -2,7 +2,7 @@ use std::mem::transmute;
 
 use crate::{
     debug::{self, debug_state},
-    mem::Addr,
+    mem::{io_regs::IoReg, Addr},
     sys::Sys,
     util::math::{add16_ui, add16_uu, bit8, bits8, join_16, set_bit8, split_16},
 };
@@ -512,8 +512,29 @@ fn jr_cond_imm8(sys: &mut Sys, cond: Cond) -> u8 {
     // todo jumping from correct starting addr??
 }
 
-fn stop(_: &mut Sys) -> u8 {
+fn stop(sys: &mut Sys) -> u8 {
     //sys.cpu_enable = false;
+
+    if sys.is_cgb_mode() {
+        // Handle Double-Speed mode toggle request.
+        println!("STOP");
+
+        let key1 = sys.mem.io_regs.get(IoReg::Key1);
+        let switch_requested = bit8(&key1, 0) == 1;
+        if switch_requested {
+            sys.mem.io_regs.mut_(IoReg::Key1, |key1: &mut u8| {
+                // Toggle Double-Speed mode field in KEY1 reg.
+                let prev_speed_mode = bit8(key1, 7);
+                let next_speed_mode = (!prev_speed_mode) & 1;
+                set_bit8(key1, 7, next_speed_mode);
+
+                // Reset Switch Requested field.
+                set_bit8(key1, 0, 0);
+            });
+
+            sys.speed_ctrl.stop();
+        }
+    }
 
     return 1;
 }
