@@ -1,6 +1,6 @@
 use crate::{
     mem::Addr,
-    util::math::{bit8, bits8},
+    util::{bits::Bits, math::bits8},
 };
 
 use super::{
@@ -111,7 +111,7 @@ impl CartHw for HwMbc5 {
                 self.rom_bank_sel_lower_8 = data;
             }
             0x3000..=0x3FFF => {
-                self.rom_bank_sel_upper_1 = bit8(&data, 0);
+                self.rom_bank_sel_upper_1 = data.bit(0);
             }
             0x4000..=0x5FFF => {
                 self.ram_bank_sel = bits8(&data, 3, 0);

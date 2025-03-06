@@ -2,7 +2,7 @@ use crate::{
     cpu::interrupt::{request_interrupt, InterruptType},
     mem::io_regs::IoReg,
     sys::Sys,
-    util::math::{bit8, bits8},
+    util::{bits::Bits, math::bits8},
 };
 
 pub const CPU_PERIOD_MCYCLES: u32 = 1;
@@ -34,7 +34,7 @@ pub fn update_timer_regs(sys: &mut Sys) {
 
     // Update TIMA
     let tac = sys.mem.io_regs.get(IoReg::Tac);
-    let enable = bit8(&tac, 2) == 1; // todo unused
+    let enable = tac.bit(2) == 1; // todo unused
     let clock_sel = bits8(&tac, 1, 0);
     let tima_clk_period = match clock_sel {
         0 => TAC_CLK_0_PERIOD_MCYCLES,

@@ -1,7 +1,7 @@
 use crate::{
     mem::{io_regs::IoReg, Addr},
     sys::Sys,
-    util::math::{bit8, bits8, set_bit8},
+    util::{bits::Bits, math::{bits8, set_bit8}},
 };
 
 use super::ppu::PpuMode;
@@ -94,7 +94,7 @@ fn start_hdma(sys: &mut Sys) {
     let dst_addr = ((hdma3 << 8) | hdma4) & 0x1FF0;
 
     let hdma5 = sys.mem.io_regs.get(IoReg::Hdma5);
-    let transfer_mode = if bit8(&hdma5, 7) == 0 {
+    let transfer_mode = if hdma5.bit(7) == 0 {
         TransferMode::General
     } else {
         TransferMode::HBlank

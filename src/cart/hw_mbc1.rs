@@ -2,7 +2,7 @@ use num::FromPrimitive;
 
 use crate::{
     mem::Addr,
-    util::math::{bit8, bits8},
+    util::{bits::Bits, math::bits8},
 };
 
 use super::{
@@ -130,7 +130,7 @@ impl CartHw for HwMbc1 {
                 self.bank_sel_upper_2 = data;
             }
             0x6000..=0x7FFF => {
-                self.mode_sel = Mode::from_u8(bit8(&data, 0))
+                self.mode_sel = Mode::from_u8(data.bit(0))
                     .expect(&format!("Invalid MBC1 banking mode value: {}.", data));
             }
             0xA000..=0xBFFF => {

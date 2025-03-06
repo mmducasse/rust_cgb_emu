@@ -16,7 +16,7 @@
 // Additionally, VRAM/OAM/… locking is “frozen”, yielding
 // different results depending on the PPU mode it’s started in.
 
-use crate::{mem::io_regs::IoReg, util::math::bit8};
+use crate::{mem::io_regs::IoReg, util::bits::Bits};
 
 use super::Sys;
 
@@ -45,7 +45,7 @@ impl SpeedControl {
 
 pub fn is_double_speed_mode_active(sys: &mut Sys) -> bool {
     let key1 = sys.mem.io_regs.get(IoReg::Key1);
-    return bit8(&key1, 7) == 1;
+    return key1.bit(7) == 1;
 }
 
 /// Does everything in the system update during the current M-Cycle?

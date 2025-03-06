@@ -7,8 +7,7 @@ use xf::num::{
 use crate::{
     consts::P8,
     mem::{io_regs::IoReg, sections::MemSection, Addr},
-    sys::Sys,
-    util::math::bit8,
+    sys::Sys, util::bits::Bits,
 };
 
 use super::{
@@ -86,7 +85,7 @@ pub fn render_scroll_view_area(sys: &Sys, org: IVec2) {
 #[inline]
 fn draw_tile_from_map(sys: &Sys, pos: IVec2, map_addr: Addr, org: IVec2) {
     let lcdc = sys.mem.io_regs.get(IoReg::Lcdc);
-    let is_mode_8000 = bit8(&lcdc, 4) == 1;
+    let is_mode_8000 = lcdc.bit(4) == 1;
     let data_idx = sys.mem.read(map_addr);
 
     let data_addr = tile_data_idx_to_addr(data_idx as u16, is_mode_8000);
@@ -105,8 +104,8 @@ fn draw_tile(bytes: &[u8], org: IVec2) {
     for pos in rect(0, 0, 8, 8).iter() {
         let idx = (pos.y * 2) as usize;
         let bit = 7 - pos.x;
-        let lower = bit8(&bytes[idx], bit as u8);
-        let upper = bit8(&bytes[idx + 1], bit as u8);
+        let lower = bytes[idx].bit(bit as u8);
+        let upper = bytes[idx + 1].bit(bit as u8);
 
         let color_id = (upper << 1) | lower;
 

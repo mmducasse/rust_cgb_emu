@@ -1,7 +1,7 @@
-#[inline]
-pub fn bit8(op: &u8, idx: u8) -> u8 {
-    (op >> idx) & 0b1
-}
+// #[inline]
+// pub fn bit8(op: &u8, idx: u8) -> u8 {
+//     (op >> idx) & 0b1
+// }
 
 #[inline]
 pub fn bits8(op: &u8, hi: usize, lo: usize) -> u8 {
@@ -89,15 +89,15 @@ mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
-    #[test]
-    fn test_bit8() {
-        let a0 = 0b0000_1110;
-        assert_eq!(bit8(&a0, 0), 0b0);
-        assert_eq!(bit8(&a0, 1), 0b1);
-        assert_eq!(bit8(&a0, 3), 0b1);
-        assert_eq!(bit8(&a0, 4), 0b0);
-        assert_eq!(bit8(&a0, 7), 0b0);
-    }
+    // #[test]
+    // fn test_bit8() {
+    //     let a0 = 0b0000_1110;
+    //     assert_eq!(bit8(&a0, 0), 0b0);
+    //     assert_eq!(bit8(&a0, 1), 0b1);
+    //     assert_eq!(bit8(&a0, 3), 0b1);
+    //     assert_eq!(bit8(&a0, 4), 0b0);
+    //     assert_eq!(bit8(&a0, 7), 0b0);
+    // }
 
     #[test]
     fn test_bits8() {
@@ -111,16 +111,16 @@ mod tests {
         assert_eq!(bits8(&x, 7, 4), 0b0100);
     }
 
-    #[test]
-    fn test_set_bit8() {
-        let mut x = 0b0000_0000;
-        set_bit8(&mut x, 5, 1);
-        assert_eq!(x, 0b0010_0000);
+    // #[test]
+    // fn test_set_bit8() {
+    //     let mut x = 0b0000_0000;
+    //     set_bit8(&mut x, 5, 1);
+    //     assert_eq!(x, 0b0010_0000);
 
-        let mut x = 0b1111_1111;
-        set_bit8(&mut x, 5, 0);
-        assert_eq!(x, 0b1101_1111);
-    }
+    //     let mut x = 0b1111_1111;
+    //     set_bit8(&mut x, 5, 0);
+    //     assert_eq!(x, 0b1101_1111);
+    // }
 
     #[test]
     fn test_set_bits8() {

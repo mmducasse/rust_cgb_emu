@@ -1,4 +1,4 @@
-use crate::util::math::bit8;
+use crate::util::bits::Bits;
 
 use super::{
     array::Array,
@@ -38,7 +38,7 @@ impl Vram {
     fn get_bank(&self, io_regs: &IoRegs) -> usize {
         if self.banks.len() > 1 {
             let vbk = io_regs.get(IoReg::Vbk);
-            return bit8(&vbk, 0) as usize;
+            return vbk.bit(0) as usize;
         }
 
         return 0;

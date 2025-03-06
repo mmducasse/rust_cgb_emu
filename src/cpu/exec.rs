@@ -4,7 +4,10 @@ use crate::{
     debug::{self, debug_state},
     mem::{io_regs::IoReg, Addr},
     sys::Sys,
-    util::math::{add16_ui, add16_uu, bit8, bits8, join_16, set_bit8, split_16},
+    util::{
+        bits::Bits,
+        math::{add16_ui, add16_uu, bits8, join_16, set_bit8, split_16},
+    },
 };
 
 use super::{
@@ -378,7 +381,7 @@ fn rlca(sys: &mut Sys) -> u8 {
 
 fn rrca(sys: &mut Sys) -> u8 {
     let mut data = sys.regs.get_8(CpuReg8::A);
-    let c = bit8(&data, 0) == 0b1;
+    let c = data.bit(0) == 0b1;
     data = u8::rotate_right(data, 1);
     sys.regs.set_8(CpuReg8::A, data);
 
@@ -397,7 +400,7 @@ fn rla(sys: &mut Sys) -> u8 {
         0b0
     };
     let mut data = sys.regs.get_8(CpuReg8::A);
-    let c_ = bit8(&data, 7) == 0b1;
+    let c_ = data.bit(7) == 0b1;
     data = u8::rotate_left(data, 1);
     set_bit8(&mut data, 0, c);
     sys.regs.set_8(CpuReg8::A, data);
@@ -520,16 +523,17 @@ fn stop(sys: &mut Sys) -> u8 {
         println!("STOP");
 
         let key1 = sys.mem.io_regs.get(IoReg::Key1);
-        let switch_requested = bit8(&key1, 0) == 1;
+        let switch_requested = key1.bit(0) == 1;
         if switch_requested {
             sys.mem.io_regs.mut_(IoReg::Key1, |key1: &mut u8| {
                 // Toggle Double-Speed mode field in KEY1 reg.
-                let prev_speed_mode = bit8(key1, 7);
-                let next_speed_mode = (!prev_speed_mode) & 1;
-                set_bit8(key1, 7, next_speed_mode);
+                // let prev_speed_mode = key1.bit(7);
+                // let next_speed_mode = (!prev_speed_mode) & 1;
+                // key1.set_bit(7, next_speed_mode);
+                key1.toggle_bit(7);
 
                 // Reset Switch Requested field.
-                set_bit8(key1, 0, 0);
+                key1.set_bit(0, 0);
             });
 
             sys.speed_ctrl.stop();
@@ -1011,7 +1015,7 @@ fn ei(sys: &mut Sys) -> u8 {
 // 0xCB prefix functions.
 fn rlc_r8(sys: &mut Sys, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
-    let c_ = bit8(&data, 7);
+    let c_ = data.bit(7);
 
     data = u8::rotate_left(data, 1);
     set_r8_data(sys, operand, data);
@@ -1026,7 +1030,7 @@ fn rlc_r8(sys: &mut Sys, operand: R8) -> u8 {
 
 fn rrc_r8(sys: &mut Sys, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
-    let c_ = bit8(&data, 0);
+    let c_ = data.bit(0);
 
     data = u8::rotate_right(data, 1);
     set_r8_data(sys, operand, data);
@@ -1042,7 +1046,7 @@ fn rrc_r8(sys: &mut Sys, operand: R8) -> u8 {
 fn rl_r8(sys: &mut Sys, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
     let c = sys.regs.get_flag(CpuFlag::C).into();
-    let c_ = bit8(&data, 7);
+    let c_ = data.bit(7);
 
     data = u8::rotate_left(data, 1);
     set_bit8(&mut data, 0, c);
@@ -1059,7 +1063,7 @@ fn rl_r8(sys: &mut Sys, operand: R8) -> u8 {
 fn rr_r8(sys: &mut Sys, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
     let c = sys.regs.get_flag(CpuFlag::C).into();
-    let c_ = bit8(&data, 0);
+    let c_ = data.bit(0);
 
     data = u8::rotate_right(data, 1);
     set_bit8(&mut data, 7, c);
@@ -1075,7 +1079,7 @@ fn rr_r8(sys: &mut Sys, operand: R8) -> u8 {
 
 fn sla_r8(sys: &mut Sys, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
-    let c_ = bit8(&data, 7);
+    let c_ = data.bit(7);
 
     data = u8::wrapping_shl(data, 1); // todo correct??
     set_r8_data(sys, operand, data);
@@ -1090,8 +1094,8 @@ fn sla_r8(sys: &mut Sys, operand: R8) -> u8 {
 
 fn sra_r8(sys: &mut Sys, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
-    let data7 = bit8(&data, 7);
-    let c_ = bit8(&data, 0);
+    let data7 = data.bit(7);
+    let c_ = data.bit(0);
 
     data = u8::wrapping_shr(data, 1); // todo correct??
     set_bit8(&mut data, 7, data7);
@@ -1122,7 +1126,7 @@ fn swap_r8(sys: &mut Sys, operand: R8) -> u8 {
 
 fn srl_r8(sys: &mut Sys, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
-    let c_ = bit8(&data, 0);
+    let c_ = data.bit(0);
 
     data = u8::wrapping_shr(data, 1); // todo correct??
     set_r8_data(sys, operand, data);
@@ -1137,7 +1141,7 @@ fn srl_r8(sys: &mut Sys, operand: R8) -> u8 {
 
 fn bit_b3_r8(sys: &mut Sys, b3: u8, operand: R8) -> u8 {
     let data = get_r8_data(sys, operand);
-    let bit = bit8(&data, b3);
+    let bit = data.bit(b3);
 
     sys.regs.set_flag(CpuFlag::Z, bit == 0);
     sys.regs.set_flag(CpuFlag::N, false);

@@ -2,8 +2,7 @@ use xf::num::ivec2::{i2, IVec2};
 
 use crate::{
     mem::{io_regs::IoReg, Addr},
-    sys::Sys,
-    util::math::bit8,
+    sys::Sys, util::bits::Bits,
 };
 
 use super::{
@@ -116,8 +115,8 @@ fn sample_pixel_from_tilemap(
     let row_lowers_addr = data_addr + (pixel_y as u16 * 2);
     let row_uppers_addr = row_lowers_addr + 1;
 
-    let lo = bit8(&sys.mem.read(row_lowers_addr), pixel_x_bit);
-    let hi = bit8(&sys.mem.read(row_uppers_addr), pixel_x_bit);
+    let lo = sys.mem.read(row_lowers_addr).bit(pixel_x_bit);
+    let hi = sys.mem.read(row_uppers_addr).bit(pixel_x_bit);
 
     return (hi << 1) | lo;
 }
@@ -142,9 +141,9 @@ fn try_draw_obj_row(sys: &Sys, obj_idx: u8, ly: u8, org: IVec2) {
     }
 
     //let priority = bit8(&attrs, 7) == 1;
-    let y_flip = bit8(&attrs, 6) == 1;
-    let x_flip = bit8(&attrs, 5) == 1;
-    let palette_reg = if bit8(&attrs, 4) == 0 {
+    let y_flip = attrs.bit(6) == 1;
+    let x_flip = attrs.bit(5) == 1;
+    let palette_reg = if attrs.bit(4) == 0 {
         IoReg::Obp0
     } else {
         IoReg::Obp1
@@ -168,8 +167,8 @@ fn try_draw_obj_row(sys: &Sys, obj_idx: u8, ly: u8, org: IVec2) {
         let row_lowers_addr = tile_data_addr + (pixel_y as u16 * 2);
         let row_uppers_addr = row_lowers_addr + 1;
 
-        let lo = bit8(&sys.mem.read(row_lowers_addr), pixel_x_bit);
-        let hi = bit8(&sys.mem.read(row_uppers_addr), pixel_x_bit);
+        let lo = sys.mem.read(row_lowers_addr).bit(pixel_x_bit);
+        let hi = sys.mem.read(row_uppers_addr).bit(pixel_x_bit);
 
         let color_id = (hi << 1) | lo;
         draw_pixel::<true>(

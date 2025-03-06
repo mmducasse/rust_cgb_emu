@@ -5,7 +5,8 @@ use crate::{
     debug,
     mem::{io_regs::IoReg, Addr},
     sys::Sys,
-    util::math::{bit8, set_bit8},
+    util::math::{set_bit8},
+    util::bits::Bits,
 };
 
 use super::exec::call;
@@ -57,8 +58,8 @@ pub fn try_handle_interrupts(sys: &mut Sys) {
 
     for type_ in InterruptType::iter() {
         let flag_idx = type_.flag_idx();
-        let is_int_enabled = bit8(&ie, flag_idx) == 1;
-        let is_int_requested = bit8(&if_, flag_idx) == 1;
+        let is_int_enabled = ie.bit(flag_idx) == 1;
+        let is_int_requested = if_.bit(flag_idx) == 1;
 
         let force = false;
 

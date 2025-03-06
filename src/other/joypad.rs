@@ -15,8 +15,7 @@ use crate::{
     mem::io_regs::IoReg,
     sys::Sys,
     util::{
-        draw::draw_empty_rect,
-        math::{bit8, set_bit8, set_bits8},
+        bits::Bits, draw::draw_empty_rect, math::{set_bit8, set_bits8}
     },
 };
 
@@ -77,8 +76,8 @@ fn draw_button(button: Button, pos: IVec2, org: IVec2) {
 
 pub fn handle_joypad_inputs(sys: &mut Sys) {
     let p1 = sys.mem.io_regs.get(IoReg::P1);
-    let select_btns = bit8(&p1, 5) == 0;
-    let select_dpad = bit8(&p1, 4) == 0;
+    let select_btns = p1.bit(5) == 0;
+    let select_dpad = p1.bit(4) == 0;
 
     let mut lo_4 = 0xF;
     if select_btns {

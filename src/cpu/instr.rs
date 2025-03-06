@@ -1,6 +1,6 @@
 use crate::{
     cpu::regs::{CpuReg16, CpuReg8},
-    util::math::{bit8, bits8},
+    util::{bits::Bits, math::bits8},
 };
 
 /// Interpretation of a 1-byte opcode instruction in ROM.
@@ -357,7 +357,7 @@ fn decode_block_0_opcode(op: u8) -> DecodeResult {
 
     // JR
     if bits8(&op, 2, 0) == 0b000 {
-        if bit8(&op, 5) == 0b1 {
+        if op.bit(5) == 0b1 {
             let cond = Cond::from_u8(bits8(&op, 4, 3));
             return Ok(Instr::Jr_Cond_Imm8 { cond });
         } else if bits8(&op, 4, 3) == 0b11 {
@@ -436,7 +436,7 @@ fn decode_block_3_opcode(op: u8) -> DecodeResult {
 
     // RET COND, RET, RETI
     let cond = Cond::from_u8(bits8(&op, 4, 3));
-    if bit8(&op, 5) == 0b0 && bits8(&op, 2, 0) == 0b000 {
+    if op.bit(5) == 0b0 && bits8(&op, 2, 0) == 0b000 {
         return Ok(Instr::Ret_Cond { cond });
     }
     if bits8(&op, 5, 0) == 0b00_1001 {
@@ -447,7 +447,7 @@ fn decode_block_3_opcode(op: u8) -> DecodeResult {
     }
 
     // JP COND IMM16, JP IMM16, JP HL
-    if bit8(&op, 5) == 0b0 && bits8(&op, 2, 0) == 0b010 {
+    if op.bit(5) == 0b0 && bits8(&op, 2, 0) == 0b010 {
         return Ok(Instr::Jp_Cond_Imm16 { cond });
     }
     if bits8(&op, 5, 0) == 0b00_0011 {
@@ -458,7 +458,7 @@ fn decode_block_3_opcode(op: u8) -> DecodeResult {
     }
 
     // CALL COND IMM16, CALL IMM16, RST TGT3
-    if bit8(&op, 5) == 0b0 && bits8(&op, 2, 0) == 0b100 {
+    if op.bit(5) == 0b0 && bits8(&op, 2, 0) == 0b100 {
         return Ok(Instr::Call_Cond_Imm16 { cond });
     }
     if bits8(&op, 5, 0) == 0b00_1101 {

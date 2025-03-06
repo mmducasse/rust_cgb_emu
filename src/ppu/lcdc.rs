@@ -1,4 +1,4 @@
-use crate::{mem::io_regs::IoReg, sys::Sys, util::math::bit8};
+use crate::{mem::io_regs::IoReg, sys::Sys, util::bits::Bits};
 
 /// Interpretation of each bit of the LCDC register.
 pub struct LcdcState {
@@ -18,14 +18,14 @@ impl LcdcState {
         let lcdc = sys.mem.io_regs.get(IoReg::Lcdc);
 
         Self {
-            ppu_enable: bit8(&lcdc, 7) == 1,
-            window_tile_map_area_is_9c00: bit8(&lcdc, 6) == 1,
-            window_enable: bit8(&lcdc, 5) == 1,
-            bg_window_tile_data_area_is_8000: bit8(&lcdc, 4) == 1,
-            bg_tile_map_area_is_9c00: bit8(&lcdc, 3) == 1,
-            obj_size_is_8x16: bit8(&lcdc, 2) == 1,
-            obj_enable: bit8(&lcdc, 1) == 1,
-            bg_window_enable: bit8(&lcdc, 0) == 1,
+            ppu_enable: lcdc.bit(7) == 1,
+            window_tile_map_area_is_9c00: lcdc.bit(6) == 1,
+            window_enable: lcdc.bit(5) == 1,
+            bg_window_tile_data_area_is_8000: lcdc.bit(4) == 1,
+            bg_tile_map_area_is_9c00: lcdc.bit(3) == 1,
+            obj_size_is_8x16: lcdc.bit(2) == 1,
+            obj_enable: lcdc.bit(1) == 1,
+            bg_window_enable: lcdc.bit(0) == 1,
         }
     }
 }

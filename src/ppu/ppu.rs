@@ -2,7 +2,7 @@ use crate::{
     cpu::interrupt::{request_interrupt, InterruptType},
     mem::io_regs::IoReg,
     sys::{speed::is_full_mcycle, Sys},
-    util::math::{bit8, set_bit8},
+    util::{bits::Bits, math::set_bit8},
 };
 
 use super::{
@@ -121,8 +121,8 @@ fn enter_scanline(sys: &mut Sys, scanline: u8) {
         set_bit8(stat, 2, lyc_ly);
     });
 
-    let lyc_ly_sel = bit8(&stat, 6) == 1;
-    let lyc_ly = bit8(&stat, 2) == 1;
+    let lyc_ly_sel = stat.bit(6) == 1;
+    let lyc_ly = stat.bit(2) == 1;
 
     if lyc_ly_sel && lyc_ly {
         request_interrupt(sys, InterruptType::Stat);
@@ -159,7 +159,7 @@ fn enter_mode(sys: &mut Sys, mode: PpuMode) {
             return;
         }
     };
-    let is_stat_mode_flag_set = bit8(&stat, stat_mode_flag_idx) == 1;
+    let is_stat_mode_flag_set = stat.bit(stat_mode_flag_idx) == 1;
     if is_stat_mode_flag_set {
         request_interrupt(sys, InterruptType::Stat);
     }
