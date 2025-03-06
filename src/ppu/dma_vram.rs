@@ -1,7 +1,7 @@
 use crate::{
     mem::{io_regs::IoReg, Addr},
     sys::Sys,
-    util::{bits::Bits, math::bits8},
+    util::bits::Bits,
 };
 
 use super::ppu::PpuMode;
@@ -99,7 +99,7 @@ fn start_hdma(sys: &mut Sys) {
     } else {
         TransferMode::HBlank
     };
-    let data_len = (bits8(&hdma5, 6, 0) + 1) * 0x10;
+    let data_len = (&hdma5.bits(6, 0) + 1) * 0x10;
 
     let hdma = sys.ppu.vram_dma_mut();
     hdma.is_active = true;

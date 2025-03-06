@@ -6,7 +6,7 @@ use crate::{
     sys::Sys,
     util::{
         bits::Bits,
-        math::{add16_ui, add16_uu, bits8, join_16, split_16},
+        math::{add16_ui, add16_uu, join_16, split_16},
     },
 };
 
@@ -339,7 +339,7 @@ fn add_hl_r16(sys: &mut Sys, operand: R16) -> u8 {
 
 fn inc_r8(sys: &mut Sys, operand: R8) -> u8 {
     let mut data = get_r8_data(sys, operand);
-    let h = bits8(&data, 3, 0) == 0b1111;
+    let h = data.bits(3, 0) == 0b1111;
 
     data = u8::wrapping_add(data, 1);
     //let res = add_2_u8(data, 1);

@@ -1,4 +1,4 @@
-use crate::{mem::sections::MemSection, util::math::bits8};
+use crate::{mem::sections::MemSection, util::bits::Bits};
 
 use super::{
     array::Array,
@@ -52,7 +52,7 @@ impl Wram {
 
         return if self.banks.len() > 2 {
             let svbk = io_regs.get(IoReg::Svbk);
-            u8::max(1, bits8(&svbk, 2, 0)) as usize
+            u8::max(1, svbk.bits(2, 0)) as usize
         } else {
             1
         };

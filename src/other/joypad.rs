@@ -14,7 +14,7 @@ use crate::{
     consts::P8,
     mem::io_regs::IoReg,
     sys::Sys,
-    util::{bits::Bits, draw::draw_empty_rect, math::set_bits8},
+    util::{bits::Bits, draw::draw_empty_rect},
 };
 
 /// Represents a Game Boy button.
@@ -93,7 +93,7 @@ pub fn handle_joypad_inputs(sys: &mut Sys) {
     }
 
     sys.mem.io_regs.mut_(IoReg::P1, |p1| {
-        set_bits8(p1, 3, 0, lo_4);
+        p1.set_bits(3, 0, lo_4);
     });
 }
 

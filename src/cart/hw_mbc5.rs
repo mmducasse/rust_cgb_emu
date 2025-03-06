@@ -1,7 +1,4 @@
-use crate::{
-    mem::Addr,
-    util::{bits::Bits, math::bits8},
-};
+use crate::{mem::Addr, util::bits::Bits};
 
 use super::{
     cart_hw::CartHw,
@@ -114,7 +111,7 @@ impl CartHw for HwMbc5 {
                 self.rom_bank_sel_upper_1 = data.bit(0);
             }
             0x4000..=0x5FFF => {
-                self.ram_bank_sel = bits8(&data, 3, 0);
+                self.ram_bank_sel = data.bits(3, 0);
             }
             0xA000..=0xBFFF => {
                 if self.ram_enable {

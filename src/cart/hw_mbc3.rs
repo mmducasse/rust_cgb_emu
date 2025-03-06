@@ -1,4 +1,4 @@
-use crate::{mem::Addr, util::math::bits8};
+use crate::{mem::Addr, util::bits::Bits};
 
 use super::{
     cart_hw::CartHw,
@@ -89,10 +89,10 @@ impl CartHw for HwMbc3 {
     fn write(&mut self, addr: Addr, data: u8) {
         match addr {
             0x0000..=0x1FFF => {
-                self.ram_timer_enable = bits8(&data, 3, 0) == 0xA;
+                self.ram_timer_enable = data.bits(3, 0) == 0xA;
             }
             0x2000..=0x3FFF => {
-                self.rom_bank_sel = bits8(&data, 6, 0);
+                self.rom_bank_sel = data.bits(6, 0);
             }
             0x4000..=0x5FFF => {
                 self.ram_bank_rtc_reg_sel = data;

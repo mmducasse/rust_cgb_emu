@@ -3,14 +3,14 @@
 //     (op >> idx) & 0b1
 // }
 
-#[inline]
-pub fn bits8(op: &u8, hi: usize, lo: usize) -> u8 {
-    let mask = 0xFF;
-    let mask = mask << (8 - (hi + 1));
-    let mask = mask >> (8 - (hi + 1 - lo));
+// #[inline]
+// pub fn bits8(op: &u8, hi: usize, lo: usize) -> u8 {
+//     let mask = 0xFF;
+//     let mask = mask << (8 - (hi + 1));
+//     let mask = mask >> (8 - (hi + 1 - lo));
 
-    return (op >> lo) & mask;
-}
+//     return (op >> lo) & mask;
+// }
 
 // #[inline]
 // pub fn set_bit8(data: &mut u8, idx: u8, value: u8) {
@@ -23,15 +23,15 @@ pub fn bits8(op: &u8, hi: usize, lo: usize) -> u8 {
 //     }
 // }
 
-#[inline]
-pub fn set_bits8(data: &mut u8, hi: u8, lo: u8, value: u8) {
-    let shift_r = 7 - (hi - lo);
-    let shift_l = lo;
-    let mask = (0xFF >> shift_r) << shift_l;
-    let value = value << lo;
+// #[inline]
+// pub fn set_bits8(data: &mut u8, hi: u8, lo: u8, value: u8) {
+//     let shift_r = 7 - (hi - lo);
+//     let shift_l = lo;
+//     let mask = (0xFF >> shift_r) << shift_l;
+//     let value = value << lo;
 
-    set_bits8_masked(data, mask, value);
-}
+//     set_bits8_masked(data, mask, value);
+// }
 
 #[inline]
 pub fn set_bits8_masked(data: &mut u8, mask: u8, value: u8) {
@@ -99,17 +99,17 @@ mod tests {
     //     assert_eq!(bit8(&a0, 7), 0b0);
     // }
 
-    #[test]
-    fn test_bits8() {
-        let x = 0b0000_1110;
-        assert_eq!(bits8(&x, 3, 1), 0b111);
-        assert_eq!(bits8(&x, 4, 2), 0b011);
+    // #[test]
+    // fn test_bits8() {
+    //     let x = 0b0000_1110;
+    //     assert_eq!(bits8(&x, 3, 1), 0b111);
+    //     assert_eq!(bits8(&x, 4, 2), 0b011);
 
-        let x = 0b0100_0001;
-        assert_eq!(bits8(&x, 7, 0), 0b0100_0001);
-        assert_eq!(bits8(&x, 3, 0), 0b0001);
-        assert_eq!(bits8(&x, 7, 4), 0b0100);
-    }
+    //     let x = 0b0100_0001;
+    //     assert_eq!(bits8(&x, 7, 0), 0b0100_0001);
+    //     assert_eq!(bits8(&x, 3, 0), 0b0001);
+    //     assert_eq!(bits8(&x, 7, 4), 0b0100);
+    // }
 
     // #[test]
     // fn test_set_bit8() {
@@ -122,16 +122,16 @@ mod tests {
     //     assert_eq!(x, 0b1101_1111);
     // }
 
-    #[test]
-    fn test_set_bits8() {
-        let mut x = 0b0000_0000;
-        set_bits8(&mut x, 5, 2, 0b1111);
-        assert_eq!(x, 0b0011_1100);
+    // #[test]
+    // fn test_set_bits8() {
+    //     let mut x = 0b0000_0000;
+    //     set_bits8(&mut x, 5, 2, 0b1111);
+    //     assert_eq!(x, 0b0011_1100);
 
-        let mut x = 0b1011_0110;
-        set_bits8(&mut x, 6, 3, 0b1001);
-        assert_eq!(x, 0b1100_1110);
-    }
+    //     let mut x = 0b1011_0110;
+    //     set_bits8(&mut x, 6, 3, 0b1001);
+    //     assert_eq!(x, 0b1100_1110);
+    // }
 
     #[test]
     fn test_set_bits8_masked() {

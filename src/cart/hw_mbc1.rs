@@ -1,9 +1,6 @@
 use num::FromPrimitive;
 
-use crate::{
-    mem::Addr,
-    util::{bits::Bits, math::bits8},
-};
+use crate::{mem::Addr, util::bits::Bits};
 
 use super::{
     cart_hw::CartHw,
@@ -45,12 +42,12 @@ impl HwMbc1 {
     }
 
     pub fn rom_bank_sel(&self) -> u8 {
-        let mut lower = bits8(&self.bank_sel_lower_5, 4, 0);
+        let mut lower = self.bank_sel_lower_5.bits(4, 0);
         if (lower & 0x1F) == 0 {
             lower += 1;
         }
         let upper = if self.mode_sel == Mode::RomBanking {
-            bits8(&self.bank_sel_upper_2, 1, 0)
+            self.bank_sel_upper_2.bits(1, 0)
         } else {
             0
         };
@@ -61,7 +58,7 @@ impl HwMbc1 {
 
     pub fn ram_bank_sel(&self) -> u8 {
         return if self.mode_sel == Mode::RamBanking {
-            bits8(&self.bank_sel_upper_2, 1, 0)
+            self.bank_sel_upper_2.bits(1, 0)
         } else {
             0
         };
@@ -121,7 +118,7 @@ impl CartHw for HwMbc1 {
     fn write(&mut self, addr: Addr, data: u8) {
         match addr {
             0x0000..=0x1FFF => {
-                self.ram_enable = bits8(&data, 3, 0) == 0xA;
+                self.ram_enable = data.bits(3, 0) == 0xA;
             }
             0x2000..=0x3FFF => {
                 self.bank_sel_lower_5 = data;
