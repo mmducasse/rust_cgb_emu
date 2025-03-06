@@ -5,7 +5,7 @@ use num::FromPrimitive;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{debug, util::math::set_bits8_masked};
+use crate::{debug, util::bits::Bits};
 
 use super::{array::Array, sections::MemSection, Addr};
 
@@ -151,7 +151,7 @@ impl IoRegs {
             } else {
                 let data = self.mem.mut_(addr);
                 let mask = reg_data.write_mask();
-                set_bits8_masked(data, mask, value);
+                data.set_bits_masked(mask, value);
             }
         } else {
             self.mem.write(addr, value);

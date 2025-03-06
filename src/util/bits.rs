@@ -1,8 +1,19 @@
+/// Helper functions for getting and setting bit fields in an integer.
 pub trait Bits<T> {
+    /// Gets the value of the bit at `idx`.
     fn bit(&self, idx: u8) -> u8;
+
+    /// Gets the value of the bit field from `hi` to `lo`.
     fn bits(&self, hi: u8, lo: u8) -> T;
+
+    /// Sets the value of the bit at `idx`.
     fn set_bit(&mut self, idx: u8, value: u8);
+
+    /// Sets the value of the bit field from `hi` to `lo`.
     fn set_bits(&mut self, hi: u8, lo: u8, value: u8);
+
+    /// Copies the bits from `value` to `self` wherever `mask` is 1.
+    fn set_bits_masked(&mut self, mask: u8, value: u8);
 
     fn toggle_bit(&mut self, idx: u8) -> u8 {
         let next = !self.bit(idx);
@@ -44,19 +55,14 @@ impl Bits<u8> for u8 {
         let mask = (0xFF >> shift_r) << shift_l;
         let value = value << lo;
 
-        super::math::set_bits8_masked(self, mask, value);
+        self.set_bits_masked(mask, value);
+    }
+
+    #[inline]
+    fn set_bits_masked(&mut self, mask: u8, value: u8) {
+        *self = (*self & !mask) | (value & mask);
     }
 }
-
-// impl Bits<u16> for u16 {
-//     fn bit(&self, idx: u8) -> u8 {
-//         return bit16(self, idx);
-//     }
-
-//     fn set_bit(&mut self, idx: u8, value: u8) {
-//         set_bit16(self, idx, value);
-//     }
-// }
 
 #[cfg(test)]
 mod tests {
@@ -105,5 +111,16 @@ mod tests {
         let mut x = 0b1011_0110;
         x.set_bits(6, 3, 0b1001);
         assert_eq!(x, 0b1100_1110);
+    }
+
+    #[test]
+    fn test_u8_set_bits_masked() {
+        let mut x = 0b0000_0000;
+        x.set_bits_masked(0b1010_1010, 0b1111_1111);
+        assert_eq!(x, 0b1010_1010);
+
+        let mut x = 0b1010_1010;
+        x.set_bits_masked(0b0000_1111, 0b0000_0000);
+        assert_eq!(x, 0b1010_0000);
     }
 }
