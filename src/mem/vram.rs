@@ -1,3 +1,5 @@
+use std::ops::Range;
+
 use crate::util::bits::Bits;
 
 use super::{
@@ -25,6 +27,10 @@ impl Vram {
         Self { banks }
     }
 
+    pub fn num_banks(&self) -> usize {
+        self.banks.len()
+    }
+
     pub fn read(&self, io_regs: &IoRegs, addr: Addr) -> u8 {
         let b = self.get_bank(io_regs);
         return self.banks[b].read(addr);
@@ -46,5 +52,9 @@ impl Vram {
 
     pub fn as_slice(&self) -> &[u8] {
         return self.banks[0].as_slice();
+    }
+
+    pub fn get_range(&self, bank: usize, range: Range<usize>) -> &[u8] {
+        return &self.banks[bank].as_slice()[range];
     }
 }

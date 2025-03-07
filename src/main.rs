@@ -61,14 +61,14 @@ async fn run_emu() {
     //let path = ".\\assets\\real_gb_roms\\Pokemon.gb";
     //let path = ".\\assets\\real_gb_roms\\Zelda.gb";
     //let path = ".\\assets\\real_gb_roms\\Kirby.gb";
-    //let path = ".\\assets\\real_gb_roms\\Tennis.gb";
+    let path = ".\\assets\\real_gb_roms\\Tennis.gb";
     //let path = ".\\assets\\real_gb_roms\\Super Mario Land 2.gb";
     //let path = ".\\assets\\real_gb_roms\\Wario Land.gb";
     //let path = ".\\assets\\real_gb_roms\\DuckTales.gb";
 
     //let path = ".\\assets\\real_cgb_roms\\Oracle of Seasons.gbc";
     //let path = ".\\assets\\real_cgb_roms\\Oracle of Ages.gbc";
-    let path = ".\\assets\\real_cgb_roms\\Crystal Version.gbc";
+    //let path = ".\\assets\\real_cgb_roms\\Crystal Version.gbc";
     //let path = ".\\assets\\real_cgb_roms\\Silver Version.gbc";
     //let path = ".\\assets\\real_cgb_roms\\Link's Awakening DX.gbc";
 
@@ -147,5 +147,9 @@ fn check_misc_inputs(sys: &mut Sys) {
     }
     if is_key_pressed(KeyCode::T) {
         sys.emu.show_win_map = !sys.emu.show_win_map;
+    }
+    if is_key_pressed(KeyCode::Y) {
+        sys.emu.vram_bank_sel += 1;
+        sys.emu.vram_bank_sel %= sys.mem.vram.num_banks();
     }
 }

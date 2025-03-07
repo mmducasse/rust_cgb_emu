@@ -19,7 +19,7 @@ use super::{
 
 /// Renders one of the tile data blocks to the screen.
 #[inline]
-pub fn render_tile_data_block(sys: &Sys, block_addr: Addr, org: IVec2) {
+pub fn render_tile_data_block(sys: &Sys, block_addr: Addr, vram_bank: usize, org: IVec2) {
     let mut i = 0;
     let range = block_addr..(block_addr + TILE_DATA_BLOCK_SIZE);
     for addr in range.clone().step_by(16) {
@@ -28,7 +28,11 @@ pub fn render_tile_data_block(sys: &Sys, block_addr: Addr, org: IVec2) {
 
         let rel_addr = (addr - TILE_DATA_ADDR_8000) as usize;
         let tile_size = TILE_DATA_TILE_SIZE as usize;
-        let bytes = &sys.mem.vram.as_slice()[rel_addr..(rel_addr + tile_size)];
+        //let bytes = &sys.mem.vram.as_slice()[rel_addr..(rel_addr + tile_size)];
+        let bytes = sys
+            .mem
+            .vram
+            .get_range(vram_bank, rel_addr..(rel_addr + tile_size));
 
         i += 1;
 

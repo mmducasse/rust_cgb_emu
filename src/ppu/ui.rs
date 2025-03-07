@@ -73,12 +73,19 @@ pub fn render_ui(sys: &mut Sys) {
     }
 
     // Tile data blocks view.
-    draw_text("0x8000 TILES", TILE_DATA_ORG - i2(0, 8));
-    render_tile_data_block(sys, 0x8000, TILE_DATA_ORG);
+    let vram_bank = sys.emu.vram_bank_sel;
+    let label = if sys.is_cgb_mode() {
+        &format!("BK{}", vram_bank)
+    } else {
+        ""
+    };
+    draw_text(format!("0x8000 TILES {}", label), TILE_DATA_ORG - i2(0, 8));
+    render_tile_data_block(sys, 0x8000, vram_bank, TILE_DATA_ORG);
     draw_text("0x8800", TILE_DATA_ORG + i2(0, TILE_DATA_BLOCK_DRAW_SIZE.y));
     render_tile_data_block(
         sys,
         0x8800,
+        vram_bank,
         TILE_DATA_ORG + i2(0, TILE_DATA_BLOCK_DRAW_P8_SIZE.y + 1) * P8,
     );
     draw_text(
@@ -88,6 +95,7 @@ pub fn render_ui(sys: &mut Sys) {
     render_tile_data_block(
         sys,
         0x9000,
+        vram_bank,
         TILE_DATA_ORG + i2(0, 2 * TILE_DATA_BLOCK_DRAW_P8_SIZE.y + 2) * P8,
     );
 }

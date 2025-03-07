@@ -6,6 +6,9 @@ pub struct Emu {
     /// False: the background tilemap is shown.
     /// True: the window tilemap is shown.
     pub show_win_map: bool,
+
+    /// Which bank to show in the tile data view.
+    pub vram_bank_sel: usize,
 }
 
 impl Emu {
