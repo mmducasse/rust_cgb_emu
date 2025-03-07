@@ -518,7 +518,7 @@ fn jr_cond_imm8(sys: &mut Sys, cond: Cond) -> u8 {
 fn stop(sys: &mut Sys) -> u8 {
     //sys.cpu_enable = false;
 
-    if sys.is_cgb_mode() {
+    if sys.is_cgb_only_mode() {
         // Handle Double-Speed mode toggle request.
         println!("STOP");
 

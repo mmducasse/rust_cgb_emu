@@ -73,8 +73,12 @@ impl Sys {
         return sys;
     }
 
-    pub fn is_cgb_mode(&self) -> bool {
+    pub fn is_cgb_only_mode(&self) -> bool {
         self.mem.cart.header().compatibility_mode().is_cgb_only()
+    }
+
+    pub fn is_cgb_mode(&self) -> bool {
+        self.mem.cart.header().compatibility_mode().is_cgb()
     }
 
     pub fn run_one_m_cycle(&mut self) {

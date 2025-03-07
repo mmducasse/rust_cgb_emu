@@ -13,7 +13,7 @@ pub struct Mem {
 
 impl Mem {
     pub fn new(cart: Cart) -> Self {
-        let is_cgb_mode = cart.header().compatibility_mode().is_cgb_only();
+        let is_cgb_mode = cart.header().compatibility_mode().is_cgb();
 
         Self {
             cart,
