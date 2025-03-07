@@ -168,6 +168,11 @@ fn try_draw_obj_row(sys: &Sys, obj_idx: u8, ly: u8, org: IVec2) {
     } else {
         IoReg::Obp1
     };
+    let vram_bank = if sys.is_cgb_mode() {
+        attrs.bit(3) as usize
+    } else {
+        0
+    };
 
     let palette = Palette::from_reg(sys, palette_reg);
 
@@ -187,8 +192,16 @@ fn try_draw_obj_row(sys: &Sys, obj_idx: u8, ly: u8, org: IVec2) {
         let row_lowers_addr = tile_data_addr + (pixel_y as u16 * 2);
         let row_uppers_addr = row_lowers_addr + 1;
 
-        let lo = sys.mem.read(row_lowers_addr).bit(pixel_x_bit);
-        let hi = sys.mem.read(row_uppers_addr).bit(pixel_x_bit);
+        let lo = sys
+            .mem
+            .vram
+            .get(vram_bank, row_lowers_addr)
+            .bit(pixel_x_bit);
+        let hi = sys
+            .mem
+            .vram
+            .get(vram_bank, row_uppers_addr)
+            .bit(pixel_x_bit);
 
         let color_id = (hi << 1) | lo;
         draw_pixel::<true>(
