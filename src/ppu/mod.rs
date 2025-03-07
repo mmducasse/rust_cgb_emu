@@ -1,3 +1,4 @@
+mod attrs;
 pub mod consts;
 mod dma_oam;
 mod dma_vram;

@@ -7,6 +7,7 @@ use crate::{
 };
 
 use super::{
+    attrs::BgAttrs,
     consts::{
         OAM_ADDR_FE00, OAM_OBJ_SIZE, TILE_DATA_ADDR_8000, TILE_DATA_TILE_SIZE, TILE_MAP_P8_SIZE,
     },
@@ -108,16 +109,34 @@ fn sample_pixel_from_tilemap(
     let map_idx = (tile_y_idx as u16 * TILE_MAP_P8_SIZE.x as u16) + tile_x_idx as u16;
     let map_addr = tile_map_start_addr + map_idx;
 
-    let data_idx = sys.mem.read(map_addr);
+    let attrs = if sys.is_cgb_mode() {
+        Some(BgAttrs::new(sys, map_addr))
+    } else {
+        None
+    };
+
+    let data_idx = sys.mem.vram.get(0, map_addr);
     let data_addr = tile_data_idx_to_addr(data_idx as u16, is_data_mode_8000);
 
-    let pixel_x_bit = 7 - (x % 8);
-    let pixel_y = y % 8;
+    let flip_x = attrs.as_ref().map(|a| a.x_flip).unwrap_or(false);
+    let flip_y = attrs.as_ref().map(|a| a.y_flip).unwrap_or(false);
+    let vram_bank = attrs.as_ref().map(|a| a.bank).unwrap_or(0);
+
+    let pixel_x_bit = if flip_x { x % 8 } else { 7 - (x % 8) };
+    let pixel_y = if flip_y { 7 - (y % 8) } else { y % 8 };
     let row_lowers_addr = data_addr + (pixel_y as u16 * 2);
     let row_uppers_addr = row_lowers_addr + 1;
 
-    let lo = sys.mem.read(row_lowers_addr).bit(pixel_x_bit);
-    let hi = sys.mem.read(row_uppers_addr).bit(pixel_x_bit);
+    let lo = sys
+        .mem
+        .vram
+        .get(vram_bank, row_lowers_addr)
+        .bit(pixel_x_bit);
+    let hi = sys
+        .mem
+        .vram
+        .get(vram_bank, row_uppers_addr)
+        .bit(pixel_x_bit);
 
     return (hi << 1) | lo;
 }

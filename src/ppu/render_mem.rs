@@ -12,6 +12,7 @@ use crate::{
 };
 
 use super::{
+    attrs::BgAttrs,
     consts::*,
     palette::Palette,
     render_util::{draw_line, draw_pixel, tile_data_idx_to_addr},
@@ -36,7 +37,7 @@ pub fn render_tile_data_block(sys: &Sys, block_addr: Addr, vram_bank: usize, org
 
         i += 1;
 
-        draw_tile(bytes, org + i2(x * 8, y * 8));
+        draw_tile(bytes, &None, org + i2(x * 8, y * 8));
     }
 }
 
@@ -91,24 +92,34 @@ pub fn render_scroll_view_area(sys: &Sys, org: IVec2) {
 fn draw_tile_from_map(sys: &Sys, pos: IVec2, map_addr: Addr, org: IVec2) {
     let lcdc = sys.mem.io_regs.get(IoReg::Lcdc);
     let is_mode_8000 = lcdc.bit(4) == 1;
-    let data_idx = sys.mem.read(map_addr);
+    let data_idx = sys.mem.vram.get(0, map_addr);
+    let attrs = if sys.is_cgb_mode() {
+        Some(BgAttrs::new(sys, map_addr))
+    } else {
+        None
+    };
 
     let data_addr = tile_data_idx_to_addr(data_idx as u16, is_mode_8000);
 
     let addr = (data_addr - MemSection::Vram.start_addr()) as usize;
-    let bytes = &sys.mem.vram.as_slice()[addr..(addr + 16)];
+    let vram_bank = attrs.as_ref().map(|a| a.bank).unwrap_or(0);
+    let bytes = sys.mem.vram.get_range(vram_bank, addr..(addr + 16));
 
     let org = pos * P8 + org;
-    draw_tile(bytes, org);
+    draw_tile(bytes, &attrs, org);
 }
 
 #[inline]
-fn draw_tile(bytes: &[u8], org: IVec2) {
+fn draw_tile(bytes: &[u8], attrs: &Option<BgAttrs>, org: IVec2) {
     const PALETTE: Palette = Palette::default();
 
+    let flip_x = attrs.as_ref().map(|a| a.x_flip).unwrap_or(false);
+    let flip_y = attrs.as_ref().map(|a| a.y_flip).unwrap_or(false);
+
     for pos in rect(0, 0, 8, 8).iter() {
-        let idx = (pos.y * 2) as usize;
-        let bit = 7 - pos.x;
+        let pos_y = if flip_y { 7 - pos.y } else { pos.y };
+        let idx = (pos_y * 2) as usize;
+        let bit = if flip_x { pos.x } else { 7 - pos.x };
         let lower = bytes[idx].bit(bit as u8);
         let upper = bytes[idx + 1].bit(bit as u8);
 
