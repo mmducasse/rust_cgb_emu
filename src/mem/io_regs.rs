@@ -7,7 +7,7 @@ use strum_macros::EnumIter;
 
 use crate::{debug, util::bits::Bits};
 
-use super::{array::Array, sections::MemSection, Addr};
+use super::{array::Array, cram::Cram, sections::MemSection, Addr};
 
 #[derive(Hash, Clone, Copy, PartialEq, Eq, Debug, FromPrimitive, EnumIter)]
 pub enum IoReg {
@@ -73,6 +73,9 @@ pub struct IoRegs {
 
     pub dma_requested: bool,
     pub hdma_requested: bool,
+
+    bg_cram: Cram,
+    obj_cram: Cram,
 }
 
 impl IoRegs {
@@ -90,81 +93,93 @@ impl IoRegs {
 
             dma_requested: false,
             hdma_requested: false,
+
+            bg_cram: Cram::new(),
+            obj_cram: Cram::new(),
         };
+    }
+
+    pub fn bg_cram(&self) -> &Cram {
+        &self.bg_cram
+    }
+
+    pub fn obj_cram(&self) -> &Cram {
+        &self.obj_cram
     }
 
     /// Reads from the readable bits in the IO register.
     pub fn user_read(&self, addr: Addr) -> u8 {
-        let mut data = if addr == IoReg::Ie.as_addr() {
-            self.ie.read(addr)
-        } else {
-            self.mem.read(addr)
+        let Some(reg) = IoReg::from_u16(addr) else {
+            return self.mem.read(addr);
         };
 
-        if let Some(reg) = IoReg::from_u16(addr) {
-            debug::record_io_reg_usage(reg, false, 0x00);
-            let Some(reg_data) = self.reg_datas.get(&reg) else {
-                unreachable!();
-            };
+        let mut data = self.get(reg);
+        debug::record_io_reg_usage(reg, false, 0x00);
+        let Some(reg_data) = self.reg_datas.get(&reg) else {
+            unreachable!();
+        };
 
-            data &= reg_data.read_mask();
-        }
-
+        data &= reg_data.read_mask();
         return data;
     }
 
     /// Reads the entire IO register.
     pub fn get(&self, reg: IoReg) -> u8 {
-        return if reg == IoReg::Ie {
-            self.ie.read(reg)
-        } else {
-            self.mem.read(reg)
+        return match reg {
+            IoReg::Ie => self.ie.read(reg),
+            IoReg::Bcps => self.bg_cram.index,
+            IoReg::Bcpd => self.bg_cram.read(),
+            IoReg::Ocps => self.obj_cram.index,
+            IoReg::Ocpd => self.obj_cram.read(),
+            _ => self.mem.read(reg),
         };
     }
 
     /// Writes to the writeable bits in the IO register.
-    pub fn user_write(&mut self, addr: Addr, value: u8) {
-        if addr == IoReg::Ie.as_addr() {
-            debug::record_io_reg_usage(IoReg::Ie, true, value);
-            self.ie.write(addr, value);
-        } else if let Some(reg) = IoReg::from_u16(addr) {
-            debug::record_io_reg_usage(reg, true, value);
-            let Some(reg_data) = self.reg_datas.get(&reg) else {
-                unreachable!();
-            };
-
-            if reg == IoReg::Sc {
-                let serial_data = self.get(IoReg::Sb);
-                debug::push_serial_char(serial_data as char);
-            } else if reg == IoReg::Dma {
-                self.dma_requested = true;
-            } else if reg == IoReg::Hdma5 {
-                self.hdma_requested = true;
-            }
-
-            if reg == IoReg::Key1 {
-                println!("  Key1: {:0>2X}", value);
-            }
-
-            if reg == IoReg::Div {
-                self.mem.write(addr, 0x00);
-            } else {
-                let data = self.mem.mut_(addr);
-                let mask = reg_data.write_mask();
-                data.set_bits_masked(mask, value);
-            }
-        } else {
+    pub fn user_write(&mut self, addr: Addr, mut value: u8) {
+        let Some(reg) = IoReg::from_u16(addr) else {
             self.mem.write(addr, value);
+            return;
+        };
+
+        debug::record_io_reg_usage(reg, true, value);
+        let Some(reg_data) = self.reg_datas.get(&reg) else {
+            unreachable!();
+        };
+
+        if reg == IoReg::Sc {
+            let serial_data = self.get(IoReg::Sb);
+            debug::push_serial_char(serial_data as char);
+        } else if reg == IoReg::Dma {
+            self.dma_requested = true;
+        } else if reg == IoReg::Hdma5 {
+            self.hdma_requested = true;
         }
+
+        if reg == IoReg::Key1 {
+            println!("  Key1: {:0>2X}", value);
+        }
+
+        if reg == IoReg::Div {
+            value = 0x00;
+        }
+
+        let mut data = self.get(reg);
+        let mask = reg_data.write_mask();
+        data.set_bits_masked(mask, value);
+        self.set(reg, data);
     }
 
     /// Sets the entire IO register.
     pub fn set(&mut self, reg: IoReg, data: u8) {
-        return if reg == IoReg::Ie {
-            self.ie.write(reg, data)
-        } else {
-            self.mem.write(reg, data)
-        };
+        match reg {
+            IoReg::Ie => self.ie.write(reg, data),
+            IoReg::Bcps => self.bg_cram.index = data,
+            IoReg::Bcpd => self.bg_cram.write(data),
+            IoReg::Ocps => self.obj_cram.index = data,
+            IoReg::Ocpd => self.obj_cram.write(data),
+            _ => self.mem.write(reg, data),
+        }
     }
 
     /// Gets a mutable reference to the IO register.

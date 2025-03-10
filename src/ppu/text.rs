@@ -1,3 +1,5 @@
+#![allow(static_mut_refs)]
+
 use xf::{
     mq::{draw::draw_texture, texture::Texture, textures::Textures},
     num::{
