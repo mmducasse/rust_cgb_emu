@@ -41,6 +41,7 @@ pub struct DebugState {
     pub request_print_last_instr: u64,
     pub print_count: u64,
     pub max_print_count: u64,
+    pub print_enabled: bool,
     serial_out_log: String,
     interrupt_counts: HashMap<InterruptType, u64>,
 }
@@ -62,6 +63,7 @@ pub fn initialize_debug(config: DebugConfig) {
             request_print_last_instr: 0,
             print_count: 0,
             max_print_count: 5,
+            print_enabled: false,
             serial_out_log: String::new(),
             interrupt_counts: HashMap::new(),
         });

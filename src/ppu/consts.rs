@@ -27,6 +27,10 @@ pub const OAM_ADDR_FE00: Addr = 0xFE00;
 pub const VIEWPORT_ORG: IVec2 = P8;
 pub const TILE_MAP_ORG: IVec2 = i2(VIEWPORT_ORG.x + (VIEWPORT_P8_SIZE.x + 1) * P8.x, P8.y);
 pub const TILE_DATA_ORG: IVec2 = i2(TILE_MAP_ORG.x + (TILE_MAP_P8_SIZE.x + 1) * P8.x, P8.y);
+pub const PALETTES_ORG: IVec2 = i2(
+    TILE_DATA_ORG.x,
+    TILE_DATA_ORG.y + (3 * (TILE_DATA_BLOCK_DRAW_SIZE.y + P8.y)),
+);
 pub const JOYPAD_ORG: IVec2 = i2(
     VIEWPORT_ORG.x,
     VIEWPORT_ORG.y + (VIEWPORT_P8_SIZE.y + 1) * P8.y,

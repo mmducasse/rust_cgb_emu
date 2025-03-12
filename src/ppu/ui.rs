@@ -11,11 +11,11 @@ use crate::{consts::P8, other::joypad::draw_joypad_state, sys::Sys};
 
 use super::{
     consts::{
-        JOYPAD_ORG, TILE_DATA_BLOCK_DRAW_P8_SIZE, TILE_DATA_BLOCK_DRAW_SIZE, TILE_DATA_ORG,
-        TILE_MAP_ORG, VIEWPORT_P8_SIZE,
+        JOYPAD_ORG, PALETTES_ORG, TILE_DATA_BLOCK_DRAW_P8_SIZE, TILE_DATA_BLOCK_DRAW_SIZE,
+        TILE_DATA_ORG, TILE_MAP_ORG, VIEWPORT_P8_SIZE,
     },
     lcdc::LcdcState,
-    render_mem::{render_scroll_view_area, render_tile_data_block, render_tile_map},
+    render_mem::{draw_palettes, render_scroll_view_area, render_tile_data_block, render_tile_map},
     render_util::get_tile_map_addr,
     text::draw_text,
 };
@@ -98,4 +98,8 @@ pub fn render_ui(sys: &mut Sys) {
         vram_bank,
         TILE_DATA_ORG + i2(0, 2 * TILE_DATA_BLOCK_DRAW_P8_SIZE.y + 2) * P8,
     );
+
+    // Palettes view.
+    draw_text("PALETTES", PALETTES_ORG - i2(0, 8));
+    draw_palettes(sys, PALETTES_ORG);
 }

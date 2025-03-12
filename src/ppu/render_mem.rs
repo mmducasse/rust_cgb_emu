@@ -1,12 +1,16 @@
 use macroquad::color::BLACK;
-use xf::num::{
-    irect::rect,
-    ivec2::{i2, IVec2},
+use xf::{
+    mq::draw::draw_rect,
+    num::{
+        irect::rect,
+        ivec2::{i2, IVec2},
+    },
 };
 
 use crate::{
-    consts::P8,
-    mem::{io_regs::IoReg, sections::MemSection, Addr},
+    consts::{P4, P8},
+    mem::{cram::Cram, io_regs::IoReg, sections::MemSection, Addr},
+    ppu::render_util::draw_pixel_c_bg,
     sys::Sys,
     util::bits::Bits,
 };
@@ -37,7 +41,7 @@ pub fn render_tile_data_block(sys: &Sys, block_addr: Addr, vram_bank: usize, org
 
         i += 1;
 
-        draw_tile(bytes, &None, org + i2(x * 8, y * 8));
+        draw_tile(sys, bytes, &None, org + i2(x * 8, y * 8));
     }
 }
 
@@ -106,15 +110,16 @@ fn draw_tile_from_map(sys: &Sys, pos: IVec2, map_addr: Addr, org: IVec2) {
     let bytes = sys.mem.vram.get_range(vram_bank, addr..(addr + 16));
 
     let org = pos * P8 + org;
-    draw_tile(bytes, &attrs, org);
+    draw_tile(sys, bytes, &attrs, org);
 }
 
 #[inline]
-fn draw_tile(bytes: &[u8], attrs: &Option<BgAttrs>, org: IVec2) {
+fn draw_tile(sys: &Sys, bytes: &[u8], attrs: &Option<BgAttrs>, org: IVec2) {
     const PALETTE: Palette = Palette::default();
 
     let flip_x = attrs.as_ref().map(|a| a.x_flip).unwrap_or(false);
     let flip_y = attrs.as_ref().map(|a| a.y_flip).unwrap_or(false);
+    let color_palette = attrs.as_ref().map(|a| a.color_palette).unwrap_or(0);
 
     for pos in rect(0, 0, 8, 8).iter() {
         let pos_y = if flip_y { 7 - pos.y } else { pos.y };
@@ -125,6 +130,33 @@ fn draw_tile(bytes: &[u8], attrs: &Option<BgAttrs>, org: IVec2) {
 
         let color_id = (upper << 1) | lower;
 
-        draw_pixel::<false>(pos + org, &PALETTE, color_id);
+        if attrs.is_none() {
+            draw_pixel::<false>(pos + org, &PALETTE, color_id);
+        } else {
+            draw_pixel_c_bg(sys, pos + org, color_palette, color_id);
+        }
+    }
+}
+
+#[inline]
+pub fn draw_palettes(sys: &Sys, org: IVec2) {
+    draw_cram_palettes(sys, sys.mem.io_regs.bg_cram(), org);
+    draw_cram_palettes(sys, sys.mem.io_regs.obj_cram(), org + (i2(10, 0) * P4));
+}
+
+#[inline]
+pub fn draw_cram_palettes(sys: &Sys, cram: &Cram, org: IVec2) {
+    for i in 0..32 {
+        let palette_id = i / 4;
+        let color_id = i % 4;
+
+        let color_idx = cram.get(palette_id, color_id);
+        let color = sys.ppu.colors().get(color_idx);
+
+        const SIZE: i32 = 4;
+        let bounds =
+            rect(palette_id as i32 * SIZE, color_id as i32 * SIZE, SIZE, SIZE).offset_by(org);
+
+        draw_rect(bounds, color);
     }
 }

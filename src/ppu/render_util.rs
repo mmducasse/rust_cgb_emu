@@ -7,7 +7,7 @@ use xf::{
     },
 };
 
-use crate::mem::Addr;
+use crate::{mem::Addr, sys::Sys};
 
 use super::{
     consts::{
@@ -52,6 +52,14 @@ pub fn draw_pixel<const TRANSPARENT: bool>(pos: IVec2, palette: &Palette, color_
         return;
     }
     let color = get_color(palette.map(color_id));
+    draw_rect(ir(pos, i2(1, 1)), color);
+}
+
+#[inline]
+pub fn draw_pixel_c_bg(sys: &Sys, pos: IVec2, palette_id: u8, color_id: u8) {
+    let color_idx = sys.mem.io_regs.bg_cram().get(palette_id, color_id);
+    let color = sys.ppu.colors().get(color_idx);
+
     draw_rect(ir(pos, i2(1, 1)), color);
 }
 

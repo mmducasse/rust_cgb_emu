@@ -6,6 +6,7 @@ use crate::{
 };
 
 use super::{
+    colors::Colors,
     consts::VIEWPORT_ORG,
     dma_oam::{update_oam_dma, DmaOam},
     dma_vram::{update_vram_dma, DmaVram},
@@ -30,6 +31,7 @@ pub struct Ppu {
     mode: PpuMode,
     dma: DmaOam,
     hdma: DmaVram,
+    colors: Colors,
 }
 
 impl Ppu {
@@ -40,6 +42,7 @@ impl Ppu {
             mode: PpuMode::HBlank,
             dma: DmaOam::new(),
             hdma: DmaVram::new(),
+            colors: Colors::new(),
         }
     }
 
@@ -57,6 +60,10 @@ impl Ppu {
 
     pub fn vram_dma_mut(&mut self) -> &mut DmaVram {
         &mut self.hdma
+    }
+
+    pub fn colors(&self) -> &Colors {
+        &self.colors
     }
 }
 

@@ -11,7 +11,7 @@
 
 use cart::cart::Cart;
 use consts::PIXEL_SCALE;
-use debug::{initialize_debug, DebugConfig};
+use debug::{debug_state, initialize_debug, DebugConfig};
 use macroquad::{
     color::BLACK,
     input::{is_key_pressed, KeyCode},
@@ -69,8 +69,8 @@ async fn run_emu() {
 
     //let path = ".\\assets\\real_cgb_roms\\Oracle of Seasons.gbc";
     //let path = ".\\assets\\real_cgb_roms\\Oracle of Ages.gbc";
-    let path = ".\\assets\\real_cgb_roms\\Crystal Version.gbc";
-    //let path = ".\\assets\\real_cgb_roms\\Silver Version.gbc";
+    //let path = ".\\assets\\real_cgb_roms\\Crystal Version.gbc";
+    let path = ".\\assets\\real_cgb_roms\\Silver Version.gbc";
     //let path = ".\\assets\\real_cgb_roms\\Link's Awakening DX.gbc";
 
     //let path = ".\\assets\\homebrew_roms\\porklike.gb";
@@ -152,5 +152,8 @@ fn check_misc_inputs(sys: &mut Sys) {
     if is_key_pressed(KeyCode::Y) {
         sys.emu.vram_bank_sel += 1;
         sys.emu.vram_bank_sel %= sys.mem.vram.num_banks();
+    }
+    if is_key_pressed(KeyCode::P) {
+        debug_state().print_enabled = !debug_state().print_enabled;
     }
 }

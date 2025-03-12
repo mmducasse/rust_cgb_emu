@@ -1,6 +1,6 @@
 mod addr;
 mod array;
-mod cram;
+pub mod cram;
 pub mod io_regs;
 pub mod mem;
 pub mod sections;
